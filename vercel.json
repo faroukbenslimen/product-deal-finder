@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://product-deal-finder.onrender.com/api/$1"
+    }
+  ]
+}
