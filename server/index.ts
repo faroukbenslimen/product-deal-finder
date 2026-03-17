@@ -17,6 +17,18 @@ const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 app.use(express.json({ limit: '1mb' }));
 
+app.get('/', (_req: Request, res: Response) => {
+  return res.json({
+    service: 'product-deal-finder-api',
+    status: 'ok',
+    message: 'Backend is running. Use POST /api/search or POST /api/identify-product.',
+  });
+});
+
+app.get('/health', (_req: Request, res: Response) => {
+  return res.json({ status: 'ok' });
+});
+
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 10;
 const requestLog = new Map<string, number[]>();
