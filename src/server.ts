@@ -206,7 +206,13 @@ The JSON must have this exact structure:
   "summary": "Brief summary of findings"
 }
 
-CRITICAL RELEVANCE INSTRUCTION: You MUST ONLY return products that EXACTLY match the user's search query ("${query}"). If a store does not sell the requested product, DO NOT include that store in the results. DO NOT return completely unrelated products. If you can only find the exact product on ONE single site, then ONLY return that one site.
+CRITICAL RELEVANCE INSTRUCTION: You MUST return ONLY products that clearly match the user's search query ("${query}"). Do NOT include unrelated products.
+
+CRITICAL RESULT COUNT INSTRUCTION: Return 5-8 recommendations whenever possible, with at least 3 recommendations unless the product is truly unavailable in the selected region.
+
+CRITICAL DIVERSITY INSTRUCTION: Prefer diverse sources (official store + marketplaces + specialist retailers + price comparison/listing sites where buyers can reach a real offer).
+
+If fewer than 3 trustworthy stores are actually available for ${region}, you may return fewer, but explain why in summary.
 
 CRITICAL URL INSTRUCTION: DO NOT GUESS OR CONSTRUCT URLs. If you do not have the EXACT, VERIFIED url directly from your search results, you MUST leave the 'url' field EMPTY ("").`;
 }
@@ -696,7 +702,10 @@ app.post('/api/search', async (req: Request, res: Response) => {
       }
     }
 
-    const normalized = normalizeSearchResult(validated, { query, minConfidence: 40 });
+    const primaryNormalized = normalizeSearchResult(validated, { query, minConfidence: 40 });
+    const normalized = primaryNormalized.recommendations.length >= 3
+      ? primaryNormalized
+      : normalizeSearchResult(validated, { query, minConfidence: 20 });
     const recommendations = applyLinkFixesAndRanking(normalized.recommendations, query);
 
     // Cache the result
