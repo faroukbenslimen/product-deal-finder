@@ -1,25 +1,44 @@
 import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
+import cors from 'cors';
 import { GoogleGenAI } from '@google/genai';
 import { normalizeSearchResult, type Recommendation } from '../src/shared/searchSchema';
 import { classifyError } from '../src/shared/errorHandling';
 import { z } from 'zod';
 
-const app = express();
-const port = Number(process.env.PORT || 8787);
-
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error('GEMINI_API_KEY is not set. Please set it in your .env file.');
+}
+
+const app = express();
+const port = Number(process.env.PORT || 4000);
+
 const openRouterApiKey = process.env.OPENROUTER_API_KEY;
 const openRouterModel = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.1-8b-instruct:free';
-if (!apiKey) {
-  console.warn('GEMINI_API_KEY is missing. /api/search will fail until it is set.');
-}
 if (!openRouterApiKey) {
   console.warn('OPENROUTER_API_KEY is missing. Fallback provider is disabled.');
 }
 
-const ai = new GoogleGenAI({ apiKey: apiKey || '' });
+const ai = new GoogleGenAI({ apiKey });
 
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:4000',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:4000',
+      'http://0.0.0.0:3000',
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/', (_req: Request, res: Response) => {

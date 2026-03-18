@@ -16,7 +16,7 @@ export default defineConfig(({mode}) => {
       // Do not modify - file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
       proxy: {
-        '/api': 'http://localhost:8787',
+        '/api': 'http://localhost:4000',
       },
     },
   };
