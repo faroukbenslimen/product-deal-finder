@@ -2,6 +2,7 @@ export interface ErrorInfo {
   status: number;
   message: string;
   isQuotaError: boolean;
+  isTemporaryOverloadError?: boolean;
 }
 
 /**
@@ -23,18 +24,42 @@ export function isQuotaError(error: any): boolean {
 }
 
 /**
+ * Detects temporary provider overload/capacity errors.
+ * Covers common formats from AI providers and gateway wrappers.
+ */
+export function isTemporaryOverloadError(error: any): boolean {
+  if (!error) return false;
+
+  const status = Number(error?.status || error?.error?.code || 0);
+  const errorString = String(error?.message || error?.error?.message || '').toLowerCase();
+
+  return (
+    status === 503 ||
+    errorString.includes('503') ||
+    errorString.includes('unavailable') ||
+    errorString.includes('high demand') ||
+    errorString.includes('temporarily unavailable') ||
+    errorString.includes('overloaded')
+  );
+}
+
+/**
  * Classifies error and returns standardized error info for API responses.
  * Used on the backend to return consistent error responses.
  */
 export function classifyError(error: any): ErrorInfo {
   const isQuota = isQuotaError(error);
+  const isOverload = isTemporaryOverloadError(error);
   
   return {
-    status: isQuota ? 429 : 500,
+    status: isQuota ? 429 : isOverload ? 503 : 500,
     message: isQuota 
       ? 'The AI quota has been exceeded. Please try again later.'
+      : isOverload
+      ? 'AI providers are experiencing high demand right now. Please retry in a few moments.'
       : error?.message || 'An unexpected error occurred.',
     isQuotaError: isQuota,
+    isTemporaryOverloadError: isOverload,
   };
 }
 
@@ -44,9 +69,14 @@ export function classifyError(error: any): ErrorInfo {
  */
 export function getUserFriendlyErrorMessage(error: any): string {
   const isQuota = isQuotaError(error);
+  const isOverload = isTemporaryOverloadError(error);
   
   if (isQuota) {
     return 'The AI search quota has been exceeded. Please try again later or check your API key billing details.';
+  }
+
+  if (isOverload) {
+    return 'Search provider is busy right now (high demand). Please try again in 20-60 seconds.';
   }
   
   return error?.message || 'An error occurred. Please try again.';
