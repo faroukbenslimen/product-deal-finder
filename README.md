@@ -37,7 +37,9 @@ Create a `.env` file in the project root:
 
 ```
 GEMINI_API_KEY=your_api_key_here
-PORT=8787
+PORT=4000
+OPENROUTER_API_KEY=optional_fallback_key
+OPENROUTER_MODEL=meta-llama/llama-3.1-8b-instruct:free
 ```
 
 ## Run Locally
@@ -92,6 +94,8 @@ To view analytics data:
 - If Render root shows JSON, that is expected (API service).
 - If search fails with 403 leaked key, rotate Gemini key and update Render `GEMINI_API_KEY`.
 - If first request is slow, Render free tier cold start may be the cause.
+- If local dev exits with `EADDRINUSE :::4000`, another process is already using port 4000. Stop the process and re-run `npm run dev`.
+- `OPENROUTER_API_KEY is missing. Fallback provider is disabled.` is a warning only. Gemini search still works.
 
 ## Notes
 

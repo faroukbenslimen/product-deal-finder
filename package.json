@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:client\"",
     "dev:client": "vite --port=3000 --host=0.0.0.0",
-    "dev:server": "tsx server/index.ts",
+    "dev:server": "tsx src/server.ts",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rimraf dist",
