@@ -1,10 +1,12 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useRef, useEffect } from 'react';
 import { Search, ShoppingBag, Star, AlertCircle, CheckCircle2, XCircle, ExternalLink, Loader2, Globe, ChevronDown, ChevronUp, ArrowUpDown, Filter, Package, Truck, Camera, Heart, TrendingUp, ShieldCheck, Clock3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { REGIONS } from './constants';
 import { normalizeSearchResult, type SearchResult } from './shared/searchSchema';
 import { getUserFriendlyErrorMessage } from './shared/errorHandling';
 import { getDirectRecommendationHref, getReliableRecommendationHref } from './utils/linkUtils';
+import ProgressStepper from './components/ProgressStepper';
+import SkeletonCard from './components/SkeletonCard';
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/640x420/e5e7eb/6b7280?text=No+Image';
 
@@ -76,9 +78,10 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [region, setRegion] = useState('Global');
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState('');
+  const [activeStep, setActiveStep] = useState(0);
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const loadingTimeoutsRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
 
   // Visual search
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
@@ -105,12 +108,33 @@ export default function App() {
     setSortConfig({ key, direction });
   };
 
+  const clearLoadingTimers = () => {
+    loadingTimeoutsRef.current.forEach((timer) => clearTimeout(timer));
+    loadingTimeoutsRef.current = [];
+  };
+
+  const startLoadingProgress = () => {
+    clearLoadingTimers();
+    setActiveStep(0);
+    loadingTimeoutsRef.current.push(
+      setTimeout(() => setActiveStep(1), 500),
+      setTimeout(() => setActiveStep(2), 2000),
+      setTimeout(() => setActiveStep(3), 4000),
+    );
+  };
+
+  useEffect(() => {
+    return () => {
+      clearLoadingTimers();
+    };
+  }, []);
+
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
+    startLoadingProgress();
     setIsLoading(true);
-    setLoadingText('Searching the web...');
     setError(null);
     setResult(null);
     setActiveRecommendation(null);
@@ -118,16 +142,6 @@ export default function App() {
     setMaxPrice('');
     setSelectedStore('All');
     setMinRating(0);
-
-    // Simulate dynamic loading text
-    const loadingInterval = setInterval(() => {
-      setLoadingText((prev) => {
-        if (prev === 'Searching the web...') return 'Comparing prices...';
-        if (prev === 'Comparing prices...') return 'Analyzing reviews...';
-        if (prev === 'Analyzing reviews...') return 'Finding the best deals...';
-        return prev;
-      });
-    }, 2500);
 
     try {
       const response = await fetch('/api/search', {
@@ -165,7 +179,7 @@ export default function App() {
       console.error("Search error:", err);
       setError(getUserFriendlyErrorMessage(err));
     } finally {
-      clearInterval(loadingInterval);
+      clearLoadingTimers();
       setIsLoading(false);
     }
   };
@@ -212,23 +226,14 @@ export default function App() {
 
           // Auto-search with identified product
           setQuery(identifiedProduct);
+          startLoadingProgress();
           setIsLoading(true);
-          setLoadingText('Searching the web...');
           setResult(null);
           setActiveRecommendation(null);
           setWatchlist([]);
           setMaxPrice('');
           setSelectedStore('All');
           setMinRating(0);
-
-          const loadingInterval = setInterval(() => {
-            setLoadingText((prev) => {
-              if (prev === 'Searching the web...') return 'Comparing prices...';
-              if (prev === 'Comparing prices...') return 'Analyzing reviews...';
-              if (prev === 'Analyzing reviews...') return 'Finding the best deals...';
-              return prev;
-            });
-          }, 2500);
 
           try {
             const searchResponse = await fetch('/api/search', {
@@ -259,12 +264,13 @@ export default function App() {
               setError('No results found. Please try a different product.');
             }
           } finally {
-            clearInterval(loadingInterval);
+            clearLoadingTimers();
             setIsLoading(false);
           }
         } catch (err: any) {
           console.error('Search error:', err);
           setError(err.message || 'An error occurred during visual search.');
+          clearLoadingTimers();
           setIsLoading(false);
         }
       };
@@ -483,14 +489,28 @@ export default function App() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mt-6 text-slate-700 font-medium flex items-center justify-center gap-2"
+                className="mt-6"
               >
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {loadingText}
+                <ProgressStepper activeStep={activeStep} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        <AnimatePresence>
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+            >
+              {Array.from({ length: 5 }).map((_, index) => (
+                <SkeletonCard key={`skeleton-${index}`} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Error State */}
         <AnimatePresence mode="wait">
