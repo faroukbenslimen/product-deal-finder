@@ -70,6 +70,9 @@ export function classifyError(error: any): ErrorInfo {
 export function getUserFriendlyErrorMessage(error: any): string {
   const isQuota = isQuotaError(error);
   const isOverload = isTemporaryOverloadError(error);
+  const rawMessage = String(error?.message || '').trim();
+  const normalizedMessage = rawMessage.toLowerCase();
+  const looksLikeHtml = normalizedMessage.includes('<!doctype') || normalizedMessage.includes('<html');
   
   if (isQuota) {
     return 'The AI search quota has been exceeded. Please try again later or check your API key billing details.';
@@ -77,6 +80,10 @@ export function getUserFriendlyErrorMessage(error: any): string {
 
   if (isOverload) {
     return 'Search provider is busy right now (high demand). Please try again in 20-60 seconds.';
+  }
+
+  if (looksLikeHtml || normalizedMessage.includes('internal server error')) {
+    return 'The search service is temporarily unavailable. Please try again in a moment.';
   }
   
   return error?.message || 'An error occurred. Please try again.';

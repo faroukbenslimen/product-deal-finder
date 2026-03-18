@@ -269,7 +269,7 @@ export default function App() {
           }
         } catch (err: any) {
           console.error('Search error:', err);
-          setError(err.message || 'An error occurred during visual search.');
+          setError(getUserFriendlyErrorMessage(err));
           clearLoadingTimers();
           setIsLoading(false);
         }

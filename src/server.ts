@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express, { type Request, type Response } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
 import { GoogleGenAI } from '@google/genai';
 import { normalizeSearchResult, type Recommendation } from './shared/searchSchema';
@@ -24,7 +24,7 @@ const ai = new GoogleGenAI({ apiKey });
 
 app.use(cors({
   origin: (origin, callback) => {
-    // During development, allow localhost and any missing origin (important for Vite proxying)
+    // Allow local development origins and deployed Vercel frontends.
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
@@ -34,14 +34,24 @@ app.use(cors({
       'http://127.0.0.1:4000',
       'http://0.0.0.0:3000',
       'http://0.0.0.0:3001',
+      'https://product-deal-finder.vercel.app',
     ];
-    // Allow requests with no origin (like proxied requests from Vite dev server)
-    if (!origin || allowedOrigins.includes(origin)) {
+
+    // Requests proxied by Vercel/Render may not include Origin.
+    if (!origin) {
       callback(null, true);
-    } else {
-      console.warn(`CORS rejected request from origin: ${origin}`);
-      callback(new Error('CORS not allowed'));
+      return;
     }
+
+    const isVercelPreview = /https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin);
+    if (allowedOrigins.includes(origin) || isVercelPreview) {
+      callback(null, true);
+      return;
+    }
+
+    console.warn(`CORS rejected request from origin: ${origin}`);
+    // Do not throw from CORS callback; keep API responses JSON and predictable.
+    callback(null, false);
   },
   credentials: true,
 }));
@@ -772,6 +782,16 @@ app.post('/api/identify-product', async (req: Request, res: Response) => {
     const { status, message } = classifyError(error);
     return res.status(status).json({ error: message });
   }
+});
+
+app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+
+  console.error('Unhandled API error:', error);
+  res.status(500).json({ error: 'Internal server error. Please try again.' });
 });
 
 app.listen(port, () => {
