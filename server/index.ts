@@ -9,8 +9,13 @@ const app = express();
 const port = Number(process.env.PORT || 8787);
 
 const apiKey = process.env.GEMINI_API_KEY;
+const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+const openRouterModel = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.1-8b-instruct:free';
 if (!apiKey) {
   console.warn('GEMINI_API_KEY is missing. /api/search will fail until it is set.');
+}
+if (!openRouterApiKey) {
+  console.warn('OPENROUTER_API_KEY is missing. Fallback provider is disabled.');
 }
 
 const ai = new GoogleGenAI({ apiKey: apiKey || '' });
@@ -31,16 +36,25 @@ app.get('/health', (_req: Request, res: Response) => {
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 10;
+const IP_COOLDOWN_MS = 4_000;
+const DAILY_MODEL_CALL_CAP = Number(process.env.DAILY_MODEL_CALL_CAP || 120);
 const requestLog = new Map<string, number[]>();
+const lastRequestByScope = new Map<string, number>();
 const domainLinkHealth = new Map<string, { success: number; failure: number }>();
 
-// Query cache: stores results for 1 hour (3600000 ms)
-const CACHE_TTL_MS = 60 * 60 * 1000;
+// Query cache: stores results for 6 hours.
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 500;
 interface CacheEntry {
   result: ReturnType<typeof normalizeSearchResult> & { recommendations: Recommendation[] };
   timestamp: number;
 }
 const queryCache = new Map<string, CacheEntry>();
+
+const dailyUsage = {
+  dayKey: new Date().toISOString().slice(0, 10),
+  modelCalls: 0,
+};
 
 const specificationSchema = z.object({
   feature: z.string(),
@@ -92,6 +106,35 @@ function isRateLimited(ip: string): boolean {
   inWindow.push(now);
   requestLog.set(ip, inWindow);
   return false;
+}
+
+function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: boolean; retryAfterMs: number } {
+  const now = Date.now();
+  const key = `${ip}::${scope}`;
+  const last = lastRequestByScope.get(key) || 0;
+  const elapsed = now - last;
+
+  if (elapsed < IP_COOLDOWN_MS) {
+    return { blocked: true, retryAfterMs: IP_COOLDOWN_MS - elapsed };
+  }
+
+  lastRequestByScope.set(key, now);
+  return { blocked: false, retryAfterMs: 0 };
+}
+
+function consumeDailyModelBudget(units = 1): boolean {
+  const currentDay = new Date().toISOString().slice(0, 10);
+  if (dailyUsage.dayKey !== currentDay) {
+    dailyUsage.dayKey = currentDay;
+    dailyUsage.modelCalls = 0;
+  }
+
+  if (dailyUsage.modelCalls + units > DAILY_MODEL_CALL_CAP) {
+    return false;
+  }
+
+  dailyUsage.modelCalls += units;
+  return true;
 }
 
 function buildPrompt(query: string, region: string): string {
@@ -292,21 +335,107 @@ async function fetchModelContent(query: string, region: string): Promise<string>
   return response.text;
 }
 
-async function repairModelContent(invalidText: string): Promise<string> {
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
-    contents: buildRepairPrompt(invalidText),
-  });
+function shouldTryFallbackProvider(error: unknown): boolean {
+  const message = String((error as any)?.message || '').toLowerCase();
+  const status = (error as any)?.status;
+  const code = (error as any)?.error?.code;
 
-  if (!response.text) {
-    throw new Error('No response text was returned during repair.');
+  return (
+    status === 429 ||
+    code === 429 ||
+    message.includes('quota') ||
+    message.includes('resource_exhausted') ||
+    message.includes('rate limit') ||
+    message.includes('timed out') ||
+    (typeof status === 'number' && status >= 500)
+  );
+}
+
+async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> {
+  if (!openRouterApiKey) {
+    throw new Error('OpenRouter fallback is not configured.');
   }
 
-  return response.text;
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${openRouterApiKey}`,
+      'HTTP-Referer': 'https://product-deal-finder.vercel.app',
+      'X-Title': 'Deal Finder',
+    },
+    body: JSON.stringify({
+      model: openRouterModel,
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      temperature: 0.2,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`OpenRouter request failed (${response.status}): ${errorBody.slice(0, 200)}`);
+  }
+
+  const payload = (await response.json()) as any;
+  const text = payload?.choices?.[0]?.message?.content;
+  if (typeof text !== 'string' || !text.trim()) {
+    throw new Error('OpenRouter returned no text content.');
+  }
+
+  return text.trim();
+}
+
+async function fetchModelContentWithFallback(query: string, region: string): Promise<{ text: string; provider: 'gemini' | 'openrouter' }> {
+  try {
+    const text = await fetchModelContent(query, region);
+    return { text, provider: 'gemini' };
+  } catch (error) {
+    if (!openRouterApiKey || !shouldTryFallbackProvider(error)) {
+      throw error;
+    }
+    const text = await fetchModelContentFromOpenRouter(buildPrompt(query, region));
+    return { text, provider: 'openrouter' };
+  }
+}
+
+async function repairModelContent(invalidText: string): Promise<string> {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: buildRepairPrompt(invalidText),
+    });
+
+    if (!response.text) {
+      throw new Error('No response text was returned during repair.');
+    }
+
+    return response.text;
+  } catch (error) {
+    if (!openRouterApiKey || !shouldTryFallbackProvider(error)) {
+      throw error;
+    }
+    return fetchModelContentFromOpenRouter(buildRepairPrompt(invalidText));
+  }
 }
 
 function getCacheKey(query: string, region: string): string {
-  return `${query.toLowerCase().trim()}|||${region.toLowerCase().trim()}`;
+  const normalizedQuery = query
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const normalizedRegion = region
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+  return `${normalizedQuery}|||${normalizedRegion}`;
 }
 
 function getCachedResult(query: string, region: string): CacheEntry | null {
@@ -325,11 +454,31 @@ function getCachedResult(query: string, region: string): CacheEntry | null {
 
 function setCachedResult(query: string, region: string, result: CacheEntry['result']): void {
   const key = getCacheKey(query, region);
+  if (queryCache.size >= MAX_CACHE_ENTRIES) {
+    let oldestKey = '';
+    let oldestTime = Number.POSITIVE_INFINITY;
+    for (const [entryKey, entry] of queryCache.entries()) {
+      if (entry.timestamp < oldestTime) {
+        oldestTime = entry.timestamp;
+        oldestKey = entryKey;
+      }
+    }
+    if (oldestKey) {
+      queryCache.delete(oldestKey);
+    }
+  }
   queryCache.set(key, { result, timestamp: Date.now() });
 }
 
 app.post('/api/search', async (req: Request, res: Response) => {
   const ip = getClientIp(req);
+  const cooldown = isInCooldown(ip, 'search');
+  if (cooldown.blocked) {
+    return res.status(429).json({
+      error: `Please wait ${Math.ceil(cooldown.retryAfterMs / 1000)}s before searching again.`,
+    });
+  }
+
   if (isRateLimited(ip)) {
     return res.status(429).json({ error: 'Rate limit exceeded. Try again in a minute.' });
   }
@@ -359,12 +508,23 @@ app.post('/api/search', async (req: Request, res: Response) => {
       });
     }
 
-    const rawText = await fetchModelContent(query, region);
+    if (!consumeDailyModelBudget(1)) {
+      return res.status(429).json({
+        error: 'Daily AI budget reached. Please try again tomorrow.',
+      });
+    }
+
+    const { text: rawText, provider } = await fetchModelContentWithFallback(query, region);
     let validated: z.infer<typeof modelResponseSchema>;
 
     try {
       validated = parseAndValidateModelResponse(rawText);
     } catch (firstError) {
+      if (!consumeDailyModelBudget(1)) {
+        return res.status(429).json({
+          error: 'Daily AI budget reached during recovery step. Please try again tomorrow.',
+        });
+      }
       const repairedText = await repairModelContent(rawText);
       try {
         validated = parseAndValidateModelResponse(repairedText);
@@ -384,6 +544,7 @@ app.post('/api/search', async (req: Request, res: Response) => {
         ...normalized,
         recommendations,
       },
+      provider,
       cached: false,
     });
   } catch (error: any) {
@@ -394,6 +555,13 @@ app.post('/api/search', async (req: Request, res: Response) => {
 
 app.post('/api/identify-product', async (req: Request, res: Response) => {
   const ip = getClientIp(req);
+  const cooldown = isInCooldown(ip, 'identify');
+  if (cooldown.blocked) {
+    return res.status(429).json({
+      error: `Please wait ${Math.ceil(cooldown.retryAfterMs / 1000)}s before analyzing another image.`,
+    });
+  }
+
   if (isRateLimited(ip)) {
     return res.status(429).json({ error: 'Rate limit exceeded. Try again in a minute.' });
   }
@@ -407,6 +575,12 @@ app.post('/api/identify-product', async (req: Request, res: Response) => {
 
   if (!apiKey) {
     return res.status(500).json({ error: 'Server is missing GEMINI_API_KEY.' });
+  }
+
+  if (!consumeDailyModelBudget(1)) {
+    return res.status(429).json({
+      error: 'Daily AI budget reached. Please try again tomorrow.',
+    });
   }
 
   try {
