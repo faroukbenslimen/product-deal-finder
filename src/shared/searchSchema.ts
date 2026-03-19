@@ -13,6 +13,7 @@ export interface Recommendation {
   serviceRating: string;
   ratingScore: number;
   isBest: boolean;
+  bestReason: string;
   imageUrl: string;
   stockStatus: string;
   shippingInfo: string;
@@ -168,6 +169,7 @@ function normalizeRecommendation(value: unknown): Recommendation {
     serviceRating: toSafeString(rec.serviceRating, 'No rating details available'),
     ratingScore,
     isBest: Boolean(rec.isBest),
+    bestReason: toSafeString(rec.bestReason, ''),
     imageUrl: sanitizeUrl(rec.imageUrl),
     stockStatus: toSafeString(rec.stockStatus, 'Unknown'),
     shippingInfo: toSafeString(rec.shippingInfo, 'Unknown'),

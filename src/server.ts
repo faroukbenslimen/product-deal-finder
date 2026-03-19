@@ -195,6 +195,7 @@ The JSON must have this exact structure:
       "serviceRating": "Good",
       "ratingScore": 4.5,
       "isBest": true,
+      "bestReason": "Why this is your best choice (price, availability, service, etc.)",
       "imageUrl": "https://...",
       "stockStatus": "In Stock",
       "shippingInfo": "Free Shipping",
@@ -211,6 +212,8 @@ CRITICAL RELEVANCE INSTRUCTION: You MUST return ONLY products that clearly match
 CRITICAL RESULT COUNT INSTRUCTION: Return 5-8 recommendations whenever possible, with at least 3 recommendations unless the product is truly unavailable in the selected region.
 
 CRITICAL DIVERSITY INSTRUCTION: Prefer diverse sources (official store + marketplaces + specialist retailers + price comparison/listing sites where buyers can reach a real offer).
+
+CRITICAL BEST REASON INSTRUCTION: For EVERY recommendation, especially the isBest=true entry, populate bestReason with a 1-2 sentence explanation of why this specific deal is good (e.g., "Lowest price with Prime shipping" or "Official store with frequent discounts and excellent reviews"). This must be specific and actionable.
 
 If fewer than 3 trustworthy stores are actually available for ${region}, you may return fewer, but explain why in summary.
 
@@ -235,6 +238,7 @@ Target structure:
       "serviceRating": "string",
       "ratingScore": 0,
       "isBest": false,
+      "bestReason": "string",
       "imageUrl": "string",
       "stockStatus": "string",
       "shippingInfo": "string",

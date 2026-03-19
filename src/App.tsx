@@ -776,20 +776,24 @@ export default function App() {
                   {filteredRecommendations.map((rec, index) => (
                     <motion.div
                       key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`relative flex flex-col bg-white rounded-2xl border ${
-                        rec.isBest ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500' : 'border-neutral-200 shadow-sm'
-                      } overflow-hidden`}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: index * 0.1, type: "spring", stiffness: 300, damping: 30 }}
+                      className={`relative flex flex-col rounded-2xl border overflow-hidden ${
+                        rec.isBest
+                          ? 'bg-gradient-to-br from-indigo-50 via-white to-indigo-50 border-indigo-400 shadow-lg ring-2 ring-indigo-300'
+                          : 'bg-white border-neutral-200 shadow-sm'
+                      }`}
                     >
                       {rec.isBest && (
-                        <div className="absolute top-0 left-0 right-0 z-10 bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider py-1.5 px-4 text-center">
+                        <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white text-xs font-bold uppercase tracking-wider py-2 px-4 text-center flex items-center justify-center gap-2 shadow-md">
+                          <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
                           Top Recommendation
+                          <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
                         </div>
                       )}
                       
-                      <div className="relative h-44 bg-neutral-100 border-b border-neutral-200 overflow-hidden flex items-center justify-center">
+                      <div className={`relative h-44 bg-neutral-100 border-b overflow-hidden flex items-center justify-center ${rec.isBest ? 'border-indigo-200' : 'border-neutral-200'}`}>
                         <img
                           src={rec.imageUrl || PLACEHOLDER_IMAGE}
                           alt={rec.productName || rec.storeName}
@@ -815,9 +819,12 @@ export default function App() {
                         )}
                       </div>
                       
-                      <div className="p-5 flex-1 flex flex-col">
-                        <div className="grid grid-cols-[1fr_auto] items-start gap-3 mb-3">
-                          <h4 className="text-lg font-bold text-neutral-900 line-clamp-2 min-w-0">{rec.storeName}</h4>
+                      <div className={`p-5 flex-1 flex flex-col ${rec.isBest ? 'pt-8' : ''}`}>
+                        <div className="grid grid-cols-[1fr_auto] items-start gap-3 mb-4">
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">Store</p>
+                            <h4 className="text-base font-bold text-neutral-900 line-clamp-2 min-w-0 leading-tight">{rec.storeName}</h4>
+                          </div>
                           <div className="text-right min-w-0 max-w-[10.75rem]">
                             <span className="text-sm font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg block leading-tight line-clamp-2 text-center sm:text-right break-words">
                               {toCompactPriceLabel(rec.price)}
@@ -842,6 +849,21 @@ export default function App() {
                           </span>
                         </div>
 
+                        {rec.bestReason && (
+                          <div className={`mb-4 p-3 rounded-xl border ${
+                            rec.isBest
+                              ? 'bg-indigo-50 border-indigo-200'
+                              : 'bg-amber-50 border-amber-200'
+                          }`}>
+                            <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${rec.isBest ? 'text-indigo-700' : 'text-amber-700'}`}>
+                              Why this deal
+                            </p>
+                            <p className={`text-sm leading-snug ${rec.isBest ? 'text-indigo-900 font-medium' : 'text-amber-900'}`}>
+                              {rec.bestReason}
+                            </p>
+                          </div>
+                        )}
+
                         <div className="mb-4 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5">
                           <div className="flex items-center justify-between mb-1.5">
                             <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">Price Trend (12 checkpoints)</p>
@@ -864,40 +886,58 @@ export default function App() {
                             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                             <span className="text-sm font-medium text-neutral-700">{rec.ratingScore}/5</span>
                           </div>
-                          <p className="text-sm text-neutral-600 mb-3 line-clamp-2">{rec.serviceRating}</p>
+                          <p className="text-xs text-neutral-600 mb-3 leading-relaxed line-clamp-2">{rec.serviceRating}</p>
                           
                           {rec.productName && (
                             <div className="mb-3 p-3 bg-neutral-50 rounded-xl border border-neutral-100">
-                              <p className="text-sm font-medium text-neutral-800 line-clamp-2" title={rec.productName}>
+                              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">Product</p>
+                              <p className="text-sm font-semibold text-neutral-900 line-clamp-2 leading-snug" title={rec.productName}>
                                 {rec.productName}
                               </p>
                             </div>
                           )}
+                          
+                          {rec.specifications && rec.specifications.length > 0 && (
+                            <div className="mb-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                              <p className="text-xs font-semibold uppercase tracking-widest text-slate-600 mb-2">Key Specs</p>
+                              <ul className="space-y-1.5">
+                                {rec.specifications.slice(0, 3).map((spec, i) => (
+                                  <li key={i} className="flex items-start justify-between gap-2 text-xs">
+                                    <span className="font-medium text-slate-700">{spec.feature}:</span>
+                                    <span className="text-slate-600 text-right line-clamp-1">{spec.value}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                              {rec.specifications.length > 3 && (
+                                <p className="text-[10px] text-slate-600 mt-1.5 font-medium">+{rec.specifications.length - 3} more specs</p>
+                              )}
+                            </div>
+                          )}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="bg-emerald-50/50 rounded-lg p-2.5 border border-emerald-100">
-                              <h5 className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wide mb-1">Pros</h5>
+                              <h5 className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1.5">Pros</h5>
                               <ul className="space-y-1">
                                 {rec.pros.slice(0, 2).map((pro, i) => (
-                                  <li key={i} className="flex items-start gap-1.5 text-xs text-neutral-700">
+                                  <li key={i} className="flex items-start gap-1.5 text-xs text-neutral-700 leading-snug">
                                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                                     <span className="line-clamp-2">{pro}</span>
                                   </li>
                                 ))}
                               </ul>
-                              {rec.pros.length > 2 && <p className="text-[11px] text-emerald-700 mt-1">+{rec.pros.length - 2} more</p>}
+                              {rec.pros.length > 2 && <p className="text-[10px] text-emerald-700 mt-1.5 font-semibold">+{rec.pros.length - 2} more</p>}
                             </div>
 
                             <div className="bg-rose-50/50 rounded-lg p-2.5 border border-rose-100">
-                              <h5 className="text-[11px] font-semibold text-rose-700 uppercase tracking-wide mb-1">Cons</h5>
+                              <h5 className="text-[10px] font-bold text-rose-700 uppercase tracking-wider mb-1.5">Cons</h5>
                               <ul className="space-y-1">
                                 {rec.cons.slice(0, 2).map((con, i) => (
-                                  <li key={i} className="flex items-start gap-1.5 text-xs text-neutral-700">
+                                  <li key={i} className="flex items-start gap-1.5 text-xs text-neutral-700 leading-snug">
                                     <XCircle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                                     <span className="line-clamp-2">{con}</span>
                                   </li>
                                 ))}
                               </ul>
-                              {rec.cons.length > 2 && <p className="text-[11px] text-rose-700 mt-1">+{rec.cons.length - 2} more</p>}
+                              {rec.cons.length > 2 && <p className="text-[10px] text-rose-700 mt-1.5 font-semibold">+{rec.cons.length - 2} more</p>}
                             </div>
                           </div>
                         </div>
