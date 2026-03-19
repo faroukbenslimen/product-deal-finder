@@ -7,6 +7,9 @@ AI-assisted product comparison that helps users find where to buy a product by c
 - Frontend (Vercel): https://product-deal-finder.vercel.app
 - Backend (Render): https://product-deal-finder.onrender.com
 - Backend health check: https://product-deal-finder.onrender.com/health
+- API Docs: [docs/API.md](docs/API.md)
+- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Testing: [docs/TESTING.md](docs/TESTING.md)
 
 Note:
 - The Render URL is API-only and returns JSON status.
@@ -22,14 +25,19 @@ Note:
 
 ## Features
 
-- Region-aware product search across global and local retailers
-- Card and table comparison views
-- Filters for max price, store, and minimum rating
-- URL fallback to safe site search when exact product URL is unavailable
-- In-memory request rate limit on API endpoint
-- Runtime response normalization before rendering
-- Visual search (upload image -> identify product -> auto-search)
-- Backend query caching for repeated requests
+- **Smart Product Comparison**: AI-powered search across 5-8 retailers per query
+- **Region-Aware**: Filters results by shipping availability to selected country
+- **Best Deal Recommendation**: AI-selected top pick with "Why this deal" explanation (bestReason)
+- **Multi-Store Results**: Diverse sources (official stores + marketplaces + specialists)
+- **Comparison Views**: Card layout or side-by-side table with sortable columns
+- **Smart Filters**: Max price, specific store, minimum rating
+- **Visual Search**: Upload image → AI identifies product → auto-searches
+- **Responsive Design**: Mobile-first with Tailwind CSS 4
+- **Loading UX**: 4-step progress stepper + skeleton placeholders
+- **Price Trends**: Visual sparkline chart showing price volatility
+- **Watchlist**: Save interesting deals for later
+- **Fallback URLs**: Safe Google site-search when exact product link unavailable
+- **API Monitoring**: `/metrics` endpoints for health checks and observability
 
 ## Environment Variables
 
@@ -55,28 +63,34 @@ Prerequisite: Node.js 18+
 
 ## Scripts
 
-- `npm run dev` starts API server and Vite dev server
-- `npm run dev:server` starts Express API only
-- `npm run dev:client` starts Vite client only
-- `npm run lint` runs TypeScript type-check
-- `npm run test` runs smoke tests
-- `npm run build` builds production client
-- `npm run preview` previews production build
+- `npm run dev` - Start frontend (Vite) + backend (Express) dev servers
+- `npm run dev:server` - Start Express API only (port 4000)
+- `npm run dev:client` - Start Vite client only (port 5173)
+- `npm run lint` - TypeScript type-check
+- `npm run build` - Build production frontend
+- `npm run preview` - Preview production build locally
+- `npm test` - Run unit and integration tests
 
-## API Endpoint
+## API Endpoints
 
-- `POST /api/search`
+- `POST /api/search` - Search for products
   - Request body: `{ "query": string, "region": string }`
-  - Success response: `{ "data": SearchResult }`
-  - Error response: `{ "error": string }`
+  - Returns: `{ "data": SearchResult }` with 5-8 recommendations, pricing, availability, and bestReason
 
-- `POST /api/identify-product`
-   - Request body: `{ "image": base64DataUrlOrBase64, "region": string }`
-   - Success response: `{ "productName": string }`
-   - Error response: `{ "error": string }`
+- `POST /api/identify-product` - Identify product from image
+   - Request body: `{ "image": base64DataUrl, "region": string }`
+   - Returns: `{ "productName": string }`
 
-- `GET /health`
-   - Success response: `{ "status": "ok" }`
+- `GET /health` - API health status
+   - Returns: `{ "status": "ok" }`
+
+- `GET /metrics` - Overall request metrics
+   - Returns: `{ "metrics": { totalRequests, successRate, avgResponseTime, ... } }`
+
+- `GET /metrics/search` - Search-specific metrics
+   - Returns: `{ "searchMetrics": { totalSearches, avgLatency, emptyResultRate, ... } }`
+
+For detailed API reference, see [docs/API.md](docs/API.md).
 
 ## Analytics
 
@@ -88,6 +102,44 @@ To view analytics data:
 3. Enable analytics for the project if prompted.
 4. Open the live app and generate traffic.
 5. Review visits, pages, and trends in dashboard.
+
+## Testing
+
+Run the full test suite:
+
+```bash
+npm run lint     # TypeScript check
+npm run build    # Verify build succeeds
+npm test         # Run unit + integration tests
+```
+
+**Test Coverage:**
+- `src/shared/searchSchema.test.ts` - Schema normalization and validation
+- `src/server.test.ts` - API endpoint behavior, error handling, caching
+
+For detailed testing guide, see [docs/TESTING.md](docs/TESTING.md).
+
+## Observability & Monitoring
+
+The backend includes built-in observability:
+
+```bash
+# Check API health
+curl https://product-deal-finder.onrender.com/health
+
+# View overall metrics (total requests, success rate, avg latency)
+curl https://product-deal-finder.onrender.com/metrics
+
+# View search-specific metrics (searches, latency, empty rates)
+curl https://product-deal-finder.onrender.com/metrics/search
+```
+
+**What's tracked:**
+- Request count, success rate, error count
+- Response times (min, max, average)
+- Search success rate and empty result percentage
+- Query caching behavior
+- Rate limiting effectiveness
 
 ## Troubleshooting
 

@@ -4,6 +4,8 @@ import cors from 'cors';
 import { GoogleGenAI } from '@google/genai';
 import { normalizeSearchResult, type Recommendation } from './shared/searchSchema';
 import { classifyError } from './shared/errorHandling';
+import { observabilityMiddleware, getMetrics, getSearchMetrics } from './middleware/observability';
+import { logger } from './utils/logger';
 import { z } from 'zod';
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -56,6 +58,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: '1mb' }));
+app.use(observabilityMiddleware);
 
 app.get('/', (_req: Request, res: Response) => {
   return res.json({
@@ -67,6 +70,14 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.get('/health', (_req: Request, res: Response) => {
   return res.json({ status: 'ok' });
+});
+
+app.get('/metrics', (_req: Request, res: Response) => {
+  return res.json({ metrics: getMetrics() });
+});
+
+app.get('/metrics/search', (_req: Request, res: Response) => {
+  return res.json({ searchMetrics: getSearchMetrics() });
 });
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
