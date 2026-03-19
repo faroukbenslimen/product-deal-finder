@@ -3,6 +3,8 @@
  * Tracks user interactions and sends events (can integrate with Google Analytics, Vercel Analytics, etc.)
  */
 
+import { track } from '@vercel/analytics';
+
 interface AnalyticsEvent {
   name: string;
   properties?: Record<string, string | number | boolean>;
@@ -12,7 +14,7 @@ interface AnalyticsEvent {
 class Analytics {
   private isEnabled = true;
   private eventQueue: AnalyticsEvent[] = [];
-  private isDev = process.env.NODE_ENV === 'development';
+  private isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
   constructor() {
     // Initialize with your analytics provider here
@@ -21,9 +23,9 @@ class Analytics {
   }
 
   private initializeProvider(): void {
-    // Placeholder for analytics provider initialization
+    // Vercel Analytics is enabled via <Analytics /> in main.tsx.
     if (this.isDev) {
-      console.log('[Analytics] Initialized (dev mode)');
+      console.log('[Analytics] Initialized with Vercel Analytics (dev mode)');
     }
   }
 
@@ -112,13 +114,16 @@ class Analytics {
   private trackEvent(name: string, properties?: Record<string, string | number | boolean>): void {
     if (!this.isEnabled) return;
 
-    const event: AnalyticsEvent = {
-      name,
-      properties,
-      timestamp: Date.now(),
-    };
-
-    this.eventQueue.push(event);
+    try {
+      track(name, properties);
+    } catch {
+      // If analytics provider is unavailable, queue for best-effort retry.
+      this.eventQueue.push({
+        name,
+        properties,
+        timestamp: Date.now(),
+      });
+    }
 
     // Log in dev mode
     if (this.isDev) {
@@ -147,15 +152,13 @@ class Analytics {
     const events = [...this.eventQueue];
     this.eventQueue = [];
 
-    // Send to analytics endpoint (optional - you can implement this)
-    // fetch('/api/analytics', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ events }),
-    //   keepalive: true, // Ensure request completes even if page unloads
-    // }).catch(() => {
-    //   // Silently fail if analytics endpoint unavailable
-    // });
+    events.forEach((event) => {
+      try {
+        track(event.name, event.properties);
+      } catch {
+        // Ignore retry failures so analytics never impacts UX.
+      }
+    });
 
     if (this.isDev) {
       console.log('[Analytics] Flushed', events.length, 'events');

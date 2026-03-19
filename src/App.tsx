@@ -5,6 +5,7 @@ import { REGIONS } from './constants';
 import { normalizeSearchResult, type SearchResult } from './shared/searchSchema';
 import { getUserFriendlyErrorMessage } from './shared/errorHandling';
 import { getDirectRecommendationHref, getReliableRecommendationHref } from './utils/linkUtils';
+import { analytics } from './analytics';
 import ProgressStepper from './components/ProgressStepper';
 import SkeletonCard from './components/SkeletonCard';
 
@@ -133,6 +134,7 @@ export default function App() {
     e.preventDefault();
     if (!query.trim()) return;
 
+    const searchStartTime = Date.now();
     startLoadingProgress();
     setIsLoading(true);
     setError(null);
@@ -172,12 +174,21 @@ export default function App() {
       normalizedResult.recommendations.sort((a, b) => (a.isBest === b.isBest ? 0 : a.isBest ? -1 : 1));
       setResult(normalizedResult);
 
+      // Track successful search
+      analytics.trackSearch(query, region, normalizedResult.recommendations.length);
+      analytics.trackTiming('search', Date.now() - searchStartTime);
+
       if (normalizedResult.recommendations.length === 0 && !normalizedResult.summary.trim()) {
         setError('No results found. Please try a different product.');
       }
     } catch (err: any) {
       console.error("Search error:", err);
-      setError(getUserFriendlyErrorMessage(err));
+      const userFriendlyError = getUserFriendlyErrorMessage(err);
+      setError(userFriendlyError);
+      
+      // Track search error
+      analytics.trackError(userFriendlyError, 'search');
+      analytics.trackTiming('search', Date.now() - searchStartTime);
     } finally {
       clearLoadingTimers();
       setIsLoading(false);
@@ -187,11 +198,13 @@ export default function App() {
   const handleImageUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file.');
+      analytics.trackImageUpload(0, false);
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       setError('Image size must be less than 5MB.');
+      analytics.trackImageUpload(file.size, false);
       return;
     }
 
@@ -216,13 +229,18 @@ export default function App() {
           const payload = await response.json().catch(() => null);
 
           if (!response.ok) {
+            analytics.trackImageUpload(file.size, false);
             throw new Error(payload?.error || 'Failed to identify product.');
           }
 
           const identifiedProduct = payload?.productName;
           if (!identifiedProduct) {
+            analytics.trackImageUpload(file.size, false);
             throw new Error('No product name extracted.');
           }
+
+          // Track successful image upload
+          analytics.trackImageUpload(file.size, true);
 
           // Auto-search with identified product
           setQuery(identifiedProduct);
@@ -260,6 +278,9 @@ export default function App() {
             normalizedResult.recommendations.sort((a, b) => (a.isBest === b.isBest ? 0 : a.isBest ? -1 : 1));
             setResult(normalizedResult);
 
+            // Track search from image
+            analytics.trackSearch(identifiedProduct, region, normalizedResult.recommendations.length);
+
             if (normalizedResult.recommendations.length === 0 && !normalizedResult.summary.trim()) {
               setError('No results found. Please try a different product.');
             }
@@ -269,7 +290,9 @@ export default function App() {
           }
         } catch (err: any) {
           console.error('Search error:', err);
-          setError(getUserFriendlyErrorMessage(err));
+          const userFriendlyError = getUserFriendlyErrorMessage(err);
+          setError(userFriendlyError);
+          analytics.trackError(userFriendlyError, 'image_search');
           clearLoadingTimers();
           setIsLoading(false);
         }
@@ -277,7 +300,9 @@ export default function App() {
       reader.readAsDataURL(file);
     } catch (err: any) {
       console.error('Image upload error:', err);
-      setError('Failed to process image.');
+      const userFriendlyError = getUserFriendlyErrorMessage(err);
+      setError(userFriendlyError);
+      analytics.trackError(userFriendlyError, 'image_upload');
       setIsAnalyzingImage(false);
     } finally {
       setIsAnalyzingImage(false);
@@ -351,6 +376,8 @@ export default function App() {
 
   const toggleWatchlist = (rec: SearchResult['recommendations'][number]) => {
     const key = getRecommendationKey(rec);
+    const isInWatchlist = watchlist.includes(key);
+    analytics.trackWatchlistAction(isInWatchlist ? 'remove' : 'add', rec.storeName);
     setWatchlist((current) => (current.includes(key) ? current.filter((item) => item !== key) : [...current, key]));
   };
 
@@ -580,7 +607,10 @@ export default function App() {
                     <input 
                       type="number" 
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                      onChange={(e) => {
+                        setMaxPrice(e.target.value === '' ? '' : Number(e.target.value));
+                        analytics.trackFilterUsage('price');
+                      }}
                       placeholder="Any"
                       className="w-20 bg-transparent border-none focus:ring-0 text-sm p-0 outline-none"
                     />
@@ -590,7 +620,10 @@ export default function App() {
                     <span className="text-sm text-neutral-500">Store:</span>
                     <select 
                       value={selectedStore}
-                      onChange={(e) => setSelectedStore(e.target.value)}
+                      onChange={(e) => {
+                        setSelectedStore(e.target.value);
+                        analytics.trackFilterUsage('store');
+                      }}
                       className="bg-transparent border-none focus:ring-0 text-sm p-0 pr-2 cursor-pointer outline-none"
                     >
                       <option value="All">All Stores</option>
@@ -604,7 +637,10 @@ export default function App() {
                     <span className="text-sm text-neutral-500">Min Rating:</span>
                     <select 
                       value={minRating}
-                      onChange={(e) => setMinRating(Number(e.target.value))}
+                      onChange={(e) => {
+                        setMinRating(Number(e.target.value));
+                        analytics.trackFilterUsage('rating');
+                      }}
                       className="bg-transparent border-none focus:ring-0 text-sm p-0 pr-2 cursor-pointer outline-none"
                     >
                       <option value={0}>Any</option>
@@ -616,13 +652,19 @@ export default function App() {
                   
                   <div className="flex items-center bg-neutral-100 rounded-xl p-1 border border-neutral-200 ml-2">
                     <button
-                      onClick={() => setViewMode('cards')}
+                      onClick={() => {
+                        setViewMode('cards');
+                        analytics.trackViewModeSwitch('cards');
+                      }}
                       className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${viewMode === 'cards' ? 'bg-white text-indigo-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'}`}
                     >
                       Cards
                     </button>
                     <button
-                      onClick={() => setViewMode('table')}
+                      onClick={() => {
+                        setViewMode('table');
+                        analytics.trackViewModeSwitch('table');
+                      }}
                       className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${viewMode === 'table' ? 'bg-white text-indigo-600 shadow-sm' : 'text-neutral-500 hover:text-neutral-700'}`}
                     >
                       Compare
@@ -630,7 +672,12 @@ export default function App() {
                   </div>
 
                   <button
-                    onClick={() => setWatchlist([])}
+                    onClick={() => {
+                      if (watchlist.length > 0) {
+                        analytics.trackWatchlistAction('remove', 'bulk_clear');
+                      }
+                      setWatchlist([]);
+                    }}
                     disabled={watchlist.length === 0}
                     className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-neutral-200 bg-neutral-50 text-sm font-medium text-neutral-700 disabled:opacity-40"
                   >
@@ -664,7 +711,14 @@ export default function App() {
                 <div className="text-center py-12 bg-white rounded-2xl border border-neutral-200 shadow-sm">
                   <p className="text-neutral-500">No results match your filters.</p>
                   <button 
-                    onClick={() => { setMaxPrice(''); setSelectedStore('All'); setMinRating(0); }} 
+                    onClick={() => {
+                      setMaxPrice('');
+                      setSelectedStore('All');
+                      setMinRating(0);
+                      analytics.trackFilterUsage('price');
+                      analytics.trackFilterUsage('store');
+                      analytics.trackFilterUsage('rating');
+                    }} 
                     className="mt-4 text-indigo-600 font-medium hover:underline"
                   >
                     Clear Filters
@@ -961,6 +1015,7 @@ export default function App() {
                       <div className="px-4 pb-3">
                         <a
                           href={getRecommendationHref(rec)}
+                          onClick={() => analytics.trackDealClick(rec.storeName, rec.isBest)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`flex items-center justify-center gap-2 w-full py-2.5 px-3 rounded-xl font-medium transition-colors ${
