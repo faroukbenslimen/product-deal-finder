@@ -596,6 +596,12 @@ export default function App() {
                 </div>
               ) : (
                 <>
+                  <div className="px-1">
+                    <p className="text-xl font-semibold text-neutral-800">
+                      Found {result.recommendations.length} stores selling '{query}' in {region}
+                    </p>
+                  </div>
+
                   <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <div className="flex items-center gap-2 text-neutral-700 font-medium shrink-0">
                   <Filter className="w-5 h-5" />
@@ -774,9 +780,12 @@ export default function App() {
                             </td>
                             <td className="p-4 font-bold text-emerald-600 whitespace-nowrap text-lg">{rec.price}</td>
                             <td className="p-4 whitespace-nowrap">
-                              <div className="flex items-center gap-1.5">
+                              <div className="relative group inline-flex items-center gap-1.5">
                                 <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                                 <span className="font-semibold text-neutral-900">{rec.ratingScore}</span>
+                                <div className="absolute left-0 bottom-full mb-2 w-72 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-600 shadow-md invisible opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none z-20">
+                                  Rating estimated by AI based on public web reviews - not from Trustpilot or Google Reviews
+                                </div>
                               </div>
                               <span className={`inline-flex mt-2 items-center px-2 py-0.5 text-[11px] border rounded-full font-semibold ${getConfidenceTone(getDealConfidence(rec))}`}>
                                 {getDealConfidence(rec)}% confidence
@@ -936,9 +945,12 @@ export default function App() {
                         </div>
 
                         <div className="mb-4 flex-1">
-                          <div className="flex items-center gap-1 mb-2">
+                          <div className="relative group inline-flex items-center gap-1 mb-2">
                             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                             <span className="text-sm font-medium text-neutral-700">{rec.ratingScore}/5</span>
+                            <div className="absolute left-0 bottom-full mb-2 w-72 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-600 shadow-md invisible opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 pointer-events-none z-20">
+                              Rating estimated by AI based on public web reviews - not from Trustpilot or Google Reviews
+                            </div>
                           </div>
                           <p className="text-xs text-neutral-600 mb-3 leading-relaxed line-clamp-2">{rec.serviceRating}</p>
                           
@@ -1187,6 +1199,10 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <footer className="text-xs text-neutral-400 text-center py-8">
+          Results are AI-generated and unsponsored. Prices and availability may vary.
+        </footer>
       </main>
     </div>
   );
