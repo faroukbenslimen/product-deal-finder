@@ -50,16 +50,15 @@ OPENROUTER_API_KEY=optional_fallback_key
 OPENROUTER_MODEL=meta-llama/llama-3.1-8b-instruct:free
 ```
 
-## Run Locally
+## Local Setup
 
 Prerequisite: Node.js 18+
 
-1. Install dependencies:
-   `npm install`
-2. Start frontend + backend together:
-   `npm run dev`
-3. Open app:
-   `http://localhost:3000`
+1. Clone the repository
+2. Run `npm install`
+3. Copy `.env.example` to `.env`
+4. Add your `GEMINI_API_KEY` to `.env`
+5. Run `npm run dev` (starts both Vite and Express)
 
 ## Scripts
 
@@ -74,8 +73,48 @@ Prerequisite: Node.js 18+
 ## API Endpoints
 
 - `POST /api/search` - Search for products
-  - Request body: `{ "query": string, "region": string }`
-  - Returns: `{ "data": SearchResult }` with 5-8 recommendations, pricing, availability, and bestReason
+   - Method: `POST`
+   - Request body shape:
+
+```json
+{
+   "query": "Sony WH-1000XM5",
+   "region": "Global"
+}
+```
+
+   - Response body shape:
+
+```json
+{
+   "data": {
+      "summary": "string",
+      "detectedCurrency": "USD",
+      "recommendations": [
+         {
+            "storeName": "string",
+            "productName": "string",
+            "price": "$299",
+            "priceValue": 299,
+            "currency": "USD",
+            "domain": "example.com",
+            "url": "https://example.com/product",
+            "shippingInfo": "string",
+            "ratingScore": 4.6,
+            "reviewCount": 1024,
+            "stockStatus": "In Stock",
+            "pros": ["string"],
+            "cons": ["string"],
+            "specifications": [{ "feature": "string", "value": "string" }],
+            "isBest": true,
+            "bestReason": "string",
+            "confidenceScore": 87,
+            "imageUrl": "https://..."
+         }
+      ]
+   }
+}
+```
 
 - `POST /api/identify-product` - Identify product from image
    - Request body: `{ "image": base64DataUrl, "region": string }`

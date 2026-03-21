@@ -6,6 +6,16 @@ export interface LinkInput {
   fallbackUrl?: string;
 }
 
+function isLikelyCdnHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return (
+    host.endsWith('cloudfront.net') ||
+    host.endsWith('akamaihd.net') ||
+    host.endsWith('fastly.net') ||
+    host.endsWith('edgekey.net')
+  );
+}
+
 export function getDirectRecommendationHref(input: LinkInput): string {
   const candidateUrl = (input.url || '').trim();
   if (!candidateUrl) return '';
@@ -17,6 +27,7 @@ export function getDirectRecommendationHref(input: LinkInput): string {
   try {
     const parsed = new URL(withProtocol);
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+    if (isLikelyCdnHost(parsed.hostname)) return '';
     return parsed.toString();
   } catch {
     return '';

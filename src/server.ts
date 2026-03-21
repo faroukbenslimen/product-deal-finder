@@ -6,6 +6,7 @@ import { normalizeSearchResult, type Recommendation } from './shared/searchSchem
 import { classifyError } from './shared/errorHandling';
 import { observabilityMiddleware, getMetrics, getSearchMetrics } from './middleware/observability';
 import { logger } from './utils/logger';
+import { buildSearchPrompt } from './prompts/searchPrompt';
 import { z } from 'zod';
 
 const apiKey = process.env.GEMINI_API_KEY;
@@ -117,6 +118,7 @@ const recommendationSchema = z.object({
   serviceRating: z.string().optional().default('No rating details available'),
   ratingScore: z.union([z.number(), z.string()]).optional().default(0),
   isBest: z.boolean().optional().default(false),
+  bestReason: z.string().optional().default(''),
   imageUrl: z.string().optional().default(''),
   stockStatus: z.string().optional().default('Unknown'),
   shippingInfo: z.string().optional().default('Unknown'),
@@ -128,6 +130,7 @@ const recommendationSchema = z.object({
 const modelResponseSchema = z.object({
   recommendations: z.array(recommendationSchema),
   summary: z.string(),
+  detectedCurrency: z.string().optional().default('USD'),
 }).strict();
 
 function getClientIp(req: Request): string {
@@ -183,54 +186,6 @@ function consumeDailyModelBudget(units = 1): boolean {
   return true;
 }
 
-function buildPrompt(query: string, region: string): string {
-  const regionContext =
-    region !== 'Global'
-      ? `\nCRITICAL REGION CONSTRAINT: You MUST ONLY return stores that are physically located in ${region} OR explicitly state they ship to ${region}. If the product is completely unavailable for purchase or shipping in ${region}, you MUST return an empty "recommendations" array [] and explain the unavailability in the "summary". Do NOT fallback to US/Global stores if they do not ship to ${region}. Prices MUST be converted to the local currency of ${region} if possible. If you are unsure if a store ships to ${region}, DO NOT include it.`
-      : ' globally';
-
-  return `Find the best places to buy "${query}"${region !== 'Global' ? '' : ' globally'}. ${regionContext}
-
-CRITICAL: You MUST return ONLY a valid JSON object. Do NOT wrap it in \`\`\`json markdown. Just return the raw JSON starting with { and ending with }.
-
-The JSON must have this exact structure:
-{
-  "recommendations": [
-    {
-      "storeName": "Name",
-      "productName": "Specific Product Name",
-      "price": "$99.99",
-      "priceValue": 99.99,
-      "url": "https://...",
-      "domain": "store.com",
-      "serviceRating": "Good",
-      "ratingScore": 4.5,
-      "isBest": true,
-      "bestReason": "Why this is your best choice (price, availability, service, etc.)",
-      "imageUrl": "https://...",
-      "stockStatus": "In Stock",
-      "shippingInfo": "Free Shipping",
-      "pros": ["pro1"],
-      "cons": ["con1"],
-      "specifications": [{"feature": "Color", "value": "Black"}]
-    }
-  ],
-  "summary": "Brief summary of findings"
-}
-
-CRITICAL RELEVANCE INSTRUCTION: You MUST return ONLY products that clearly match the user's search query ("${query}"). Do NOT include unrelated products.
-
-CRITICAL RESULT COUNT INSTRUCTION: Return 5-8 recommendations whenever possible, with at least 3 recommendations unless the product is truly unavailable in the selected region.
-
-CRITICAL DIVERSITY INSTRUCTION: Prefer diverse sources (official store + marketplaces + specialist retailers + price comparison/listing sites where buyers can reach a real offer).
-
-CRITICAL BEST REASON INSTRUCTION: For EVERY recommendation, especially the isBest=true entry, populate bestReason with a 1-2 sentence explanation of why this specific deal is good (e.g., "Lowest price with Prime shipping" or "Official store with frequent discounts and excellent reviews"). This must be specific and actionable.
-
-If fewer than 3 trustworthy stores are actually available for ${region}, you may return fewer, but explain why in summary.
-
-CRITICAL URL INSTRUCTION: DO NOT GUESS OR CONSTRUCT URLs. If you do not have the EXACT, VERIFIED url directly from your search results, you MUST leave the 'url' field EMPTY ("").`;
-}
-
 function buildRepairPrompt(invalidText: string): string {
   return `You are a JSON repair assistant.
 
@@ -258,7 +213,8 @@ Target structure:
       "specifications": [{"feature": "string", "value": "string"}]
     }
   ],
-  "summary": "string"
+  "summary": "string",
+  "detectedCurrency": "USD"
 }
 
 Input to repair:
@@ -320,6 +276,14 @@ function toSafeNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+function toSafeCurrency(value: unknown, fallback = 'USD'): string {
+  const raw = toSafeString(value, fallback).trim().toUpperCase();
+  if (/^[A-Z]{3}$/.test(raw)) {
+    return raw;
+  }
+  return fallback;
+}
+
 function toSafeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.map((item) => toSafeString(item)).filter(Boolean).slice(0, 8);
@@ -361,6 +325,7 @@ function coerceModelPayload(value: unknown): unknown {
       serviceRating: toSafeString(rec.serviceRating, 'No rating details available'),
       ratingScore: toSafeNumber(rec.ratingScore, 0),
       isBest: Boolean(rec.isBest),
+      bestReason: toSafeString(rec.bestReason, ''),
       imageUrl: toSafeString(rec.imageUrl, ''),
       stockStatus: toSafeString(rec.stockStatus, 'Unknown'),
       shippingInfo: toSafeString(rec.shippingInfo, 'Unknown'),
@@ -373,6 +338,7 @@ function coerceModelPayload(value: unknown): unknown {
   return {
     recommendations,
     summary: toSafeString(root.summary, ''),
+    detectedCurrency: toSafeCurrency(root.detectedCurrency, 'USD'),
   };
 }
 
@@ -414,6 +380,27 @@ function tokenize(text: string): string[] {
     .filter((token) => token.length > 2);
 }
 
+function normalizeHost(value: string): string {
+  return value.toLowerCase().replace(/^www\./, '').trim();
+}
+
+function hostMatchesDomain(host: string, domain: string): boolean {
+  const safeHost = normalizeHost(host);
+  const safeDomain = normalizeHost(domain);
+  if (!safeHost || !safeDomain) return false;
+  return safeHost === safeDomain || safeHost.endsWith(`.${safeDomain}`);
+}
+
+function isLikelyCdnHost(host: string): boolean {
+  const safeHost = normalizeHost(host);
+  return (
+    safeHost.endsWith('cloudfront.net') ||
+    safeHost.endsWith('akamaihd.net') ||
+    safeHost.endsWith('fastly.net') ||
+    safeHost.endsWith('edgekey.net')
+  );
+}
+
 function evaluateUrlQuality(rec: Recommendation, query: string): { score: number; useDirect: boolean } {
   if (!rec.url) {
     return { score: 35, useDirect: false };
@@ -428,23 +415,32 @@ function evaluateUrlQuality(rec: Recommendation, query: string): { score: number
 
   let score = 80;
   const path = parsed.pathname.toLowerCase();
+  const host = parsed.hostname;
+  const normalizedRecDomain = (rec.domain || '').trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
   const genericPathPattern = /\/(search|category|categories|collections|products|shop|store|deals?)\b/;
 
+  if (isLikelyCdnHost(host)) score -= 40;
+  if (normalizedRecDomain && !hostMatchesDomain(host, normalizedRecDomain)) score -= 35;
   if (path === '/' || path.length <= 1) score -= 35;
   if (genericPathPattern.test(path)) score -= 25;
+  if (/\/(errors?|blocked|captcha|access-denied)\b/.test(path)) score -= 40;
   if (parsed.search.includes('q=') || parsed.search.includes('search=')) score -= 20;
 
   const combinedTarget = `${rec.productName || ''} ${query}`;
   const queryTokens = tokenize(combinedTarget);
   const pathTokens = tokenize(path.replace(/\//g, ' '));
-  if (queryTokens.length > 0 && pathTokens.length > 0) {
-    const matched = queryTokens.filter((token) => pathTokens.includes(token)).length;
-    const ratio = matched / queryTokens.length;
-    if (ratio >= 0.45) score += 15;
-    else if (ratio < 0.2) score -= 15;
+  if (queryTokens.length > 0) {
+    if (pathTokens.length === 0) {
+      score -= 25;
+    } else {
+      const matched = queryTokens.filter((token) => pathTokens.includes(token)).length;
+      const ratio = matched / queryTokens.length;
+      if (ratio >= 0.45) score += 15;
+      else if (ratio >= 0.3) score += 5;
+      else score -= 30;
+    }
   }
 
-  const host = parsed.hostname;
   const stats = domainLinkHealth.get(host);
   if (stats) {
     const total = stats.success + stats.failure;
@@ -455,7 +451,7 @@ function evaluateUrlQuality(rec: Recommendation, query: string): { score: number
   }
 
   score = Math.max(0, Math.min(100, score));
-  return { score, useDirect: score >= 55 };
+  return { score, useDirect: score >= 70 };
 }
 
 function setLinkHealth(hostname: string, success: boolean): void {
@@ -506,7 +502,7 @@ function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recomm
 async function fetchModelContent(query: string, region: string): Promise<string> {
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
-    contents: buildPrompt(query, region),
+    contents: buildSearchPrompt(query, region),
     config: {
       tools: [{ googleSearch: {} }],
     },
@@ -582,7 +578,7 @@ async function fetchModelContentWithFallback(query: string, region: string): Pro
     if (!openRouterApiKey || !shouldTryFallbackProvider(error)) {
       throw error;
     }
-    const text = await fetchModelContentFromOpenRouter(buildPrompt(query, region));
+    const text = await fetchModelContentFromOpenRouter(buildSearchPrompt(query, region));
     return { text, provider: 'openrouter' };
   }
 }
@@ -703,6 +699,9 @@ app.post('/api/search', async (req: Request, res: Response) => {
 
     try {
       validated = parseAndValidateModelResponse(rawText);
+      if (!Array.isArray(validated.recommendations)) {
+        return res.status(500).json({ error: 'Unexpected response format. Please try again.' });
+      }
     } catch (firstError) {
       if (!consumeDailyModelBudget(1)) {
         return res.status(429).json({
@@ -712,6 +711,9 @@ app.post('/api/search', async (req: Request, res: Response) => {
       const repairedText = await repairModelContent(rawText);
       try {
         validated = parseAndValidateModelResponse(repairedText);
+        if (!Array.isArray(validated.recommendations)) {
+          return res.status(500).json({ error: 'Unexpected response format. Please try again.' });
+        }
       } catch {
         return res.status(502).json({ error: 'Model returned invalid structured JSON after retry.' });
       }

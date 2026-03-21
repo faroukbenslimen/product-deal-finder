@@ -1,4 +1,5 @@
 import { CheckCircle2, Circle } from 'lucide-react';
+// Keep motion/react for per-step state transitions and icon swap animations that are not simple CSS fades.
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ProgressStepperProps {

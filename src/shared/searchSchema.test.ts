@@ -104,4 +104,27 @@ describe('normalizeSearchResult smoke paths', () => {
 
     expect(result.recommendations).toHaveLength(0);
   });
+
+  it('normalizes detectedCurrency and falls back to USD for invalid values', () => {
+    const validCurrency = normalizeSearchResult({
+      recommendations: [],
+      summary: 'currency check',
+      detectedCurrency: 'eur',
+    });
+
+    const invalidCurrency = normalizeSearchResult({
+      recommendations: [],
+      summary: 'currency fallback',
+      detectedCurrency: 'EURO',
+    });
+
+    const missingCurrency = normalizeSearchResult({
+      recommendations: [],
+      summary: 'currency missing',
+    });
+
+    expect(validCurrency.detectedCurrency).toBe('EUR');
+    expect(invalidCurrency.detectedCurrency).toBe('USD');
+    expect(missingCurrency.detectedCurrency).toBe('USD');
+  });
 });

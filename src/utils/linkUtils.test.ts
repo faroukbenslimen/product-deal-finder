@@ -12,6 +12,12 @@ describe('linkUtils', () => {
     expect(getDirectRecommendationHref({ url: 'not a url' })).toBe('');
   });
 
+  it('rejects likely CDN direct URL hosts', () => {
+    expect(getDirectRecommendationHref({ url: 'https://d123abc.cloudfront.net/product-page' })).toBe('');
+    expect(getDirectRecommendationHref({ url: 'https://assets.fastly.net/item/123' })).toBe('');
+    expect(getDirectRecommendationHref({ url: 'https://images.akamaihd.net/catalog/sku-1' })).toBe('');
+  });
+
   it('builds reliable link from domain', () => {
     const href = getReliableRecommendationHref(
       {

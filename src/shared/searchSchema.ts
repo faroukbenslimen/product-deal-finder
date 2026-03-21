@@ -30,6 +30,7 @@ export interface Recommendation {
 export interface SearchResult {
   recommendations: Recommendation[];
   summary: string;
+  detectedCurrency: string;
 }
 
 export interface NormalizeOptions {
@@ -204,5 +205,11 @@ export function normalizeSearchResult(value: unknown, options: NormalizeOptions 
       : 'No validated recommendations were returned for this search.'
   );
 
-  return { recommendations, summary };
+  const detectedCurrency = toSafeString(root.detectedCurrency, 'USD').toUpperCase();
+
+  return {
+    recommendations,
+    summary,
+    detectedCurrency: /^[A-Z]{3}$/.test(detectedCurrency) ? detectedCurrency : 'USD',
+  };
 }
