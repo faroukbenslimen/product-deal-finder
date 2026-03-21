@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local-only prompt notes
+CLAUDE_REVIEW_PROMPT.txt
+product-deal-finder-improvement-prompt-v2.txt
