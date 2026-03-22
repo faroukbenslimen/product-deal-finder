@@ -18,7 +18,9 @@ const app = express();
 const port = Number(process.env.PORT || 4000);
 
 const openRouterApiKey = process.env.OPENROUTER_API_KEY;
-const openRouterModel = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.1-8b-instruct:free';
+const openRouterModel = (process.env.OPENROUTER_MODEL || '')
+  .trim()
+  .replace(/^['\"]|['\"]$/g, '') || 'meta-llama/llama-3.1-8b-instruct:free';
 if (!openRouterApiKey) {
   console.warn('OPENROUTER_API_KEY is missing. Fallback provider is disabled.');
 }

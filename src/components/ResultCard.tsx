@@ -40,7 +40,7 @@ export default function ResultCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ${
+      className={`group relative flex flex-col rounded-2xl border overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ${
         rec.isBest
           ? 'bg-gradient-to-br from-indigo-50 via-white to-indigo-50 border-indigo-400 shadow-lg ring-2 ring-indigo-300 border-l-4 border-indigo-600 hover:scale-105 transition-transform'
           : 'bg-white border-neutral-200 shadow-sm'
@@ -52,21 +52,27 @@ export default function ResultCard({
         </div>
       )}
 
-      <div className={`relative h-44 bg-neutral-100 border-b overflow-hidden flex items-center justify-center ${rec.isBest ? 'border-indigo-200' : 'border-neutral-200'}`}>
-        <img
-          src={rec.imageUrl || placeholderImage}
-          alt={rec.productName || rec.storeName}
-          className="w-full h-full object-contain p-3"
-          referrerPolicy="no-referrer"
-          onError={(event) => {
-            const target = event.currentTarget;
-            target.onerror = null;
-            target.src = placeholderImage;
-          }}
-        />
+      <div
+        className={`relative h-44 border-b overflow-hidden flex items-center justify-center bg-[radial-gradient(circle_at_50%_18%,#ffffff_0%,#eef2f7_55%,#e2e8f0_100%)] ${rec.isBest ? 'border-indigo-200' : 'border-neutral-200'}`}
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.75),rgba(248,250,252,0.15)_45%,rgba(226,232,240,0.35))]" />
+        <div className="absolute left-1/2 bottom-3 h-5 w-2/3 -translate-x-1/2 rounded-full bg-slate-900/12 blur-md" />
+        <div className="relative z-[1] m-3 h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] rounded-xl border border-white/80 bg-white/70 shadow-[0_14px_32px_-20px_rgba(15,23,42,0.85)] backdrop-blur-[1px] flex items-center justify-center overflow-hidden">
+          <img
+            src={rec.imageUrl || placeholderImage}
+            alt={rec.productName || rec.storeName}
+            className="w-full h-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-[1.02]"
+            referrerPolicy="no-referrer"
+            onError={(event) => {
+              const target = event.currentTarget;
+              target.onerror = null;
+              target.src = placeholderImage;
+            }}
+          />
+        </div>
 
         {rec.stockStatus && rec.stockStatus !== 'Unknown' && (
-          <div className={`absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5 ${
+          <div className={`absolute bottom-3 left-3 z-10 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm flex items-center gap-1.5 ${
             rec.stockStatus.toLowerCase().includes('out')
               ? 'bg-red-100 text-red-700'
               : rec.stockStatus.toLowerCase().includes('pre')
