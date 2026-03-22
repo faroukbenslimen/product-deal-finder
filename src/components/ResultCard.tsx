@@ -1,3 +1,4 @@
+﻿// File role: Individual recommendation card with pricing, trust, and CTA actions.
 import { CheckCircle2, Clock3, ExternalLink, Heart, Package, ShieldCheck, Star, Truck, XCircle } from 'lucide-react';
 import { type Recommendation } from '../shared/searchSchema';
 
@@ -14,6 +15,12 @@ interface ResultCardProps {
   onDealClick: () => void;
 }
 
+/**
+ * To Compact Price Label so this file stays easier to maintain for the next developer.
+ *
+ * @param price - price provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toCompactPriceLabel(price: string): string {
   const normalized = price.replace(/\s+/g, ' ').trim();
   if (normalized.length <= 28) return normalized;
@@ -24,6 +31,12 @@ function toCompactPriceLabel(price: string): string {
   return `${withoutParentheses.slice(0, 25)}...`;
 }
 
+/**
+ * Result Card so this file stays easier to maintain for the next developer.
+ *
+ * @param { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } - { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function ResultCard({
   rec,
   placeholderImage,
@@ -48,7 +61,7 @@ export default function ResultCard({
     >
       {rec.isBest && (
         <div className="absolute top-3 right-3 z-10 bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-full">
-          ⭐ Best Pick
+          â­ Best Pick
         </div>
       )}
 
@@ -186,7 +199,7 @@ export default function ResultCard({
               : 'bg-indigo-600 text-white hover:bg-indigo-700'
           }`}
         >
-          {isFallbackLink ? '🔍 Search on Google' : 'View Deal'}
+          {isFallbackLink ? 'ðŸ” Search on Google' : 'View Deal'}
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
@@ -209,3 +222,4 @@ export default function ResultCard({
     </div>
   );
 }
+

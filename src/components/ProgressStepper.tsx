@@ -1,3 +1,4 @@
+﻿// File role: Visual stepper that reflects staged progress during active search.
 import { CheckCircle2, Circle } from 'lucide-react';
 // Keep motion/react for per-step state transitions and icon swap animations that are not simple CSS fades.
 import { motion, AnimatePresence } from 'motion/react';
@@ -6,6 +7,7 @@ interface ProgressStepperProps {
   activeStep: number;
 }
 
+// These labels map to staged search progress so users can see why loading takes time.
 const STEPS = [
   'Searching the web',
   'Comparing prices',
@@ -13,6 +15,12 @@ const STEPS = [
   'Finalizing results',
 ];
 
+/**
+ * Progress Stepper so this file stays easier to maintain for the next developer.
+ *
+ * @param { activeStep } - { activeStep } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function ProgressStepper({ activeStep }: ProgressStepperProps) {
   return (
     <div className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-5 shadow-sm">
@@ -72,3 +80,4 @@ export default function ProgressStepper({ activeStep }: ProgressStepperProps) {
     </div>
   );
 }
+

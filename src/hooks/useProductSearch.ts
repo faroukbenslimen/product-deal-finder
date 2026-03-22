@@ -1,7 +1,13 @@
+﻿// File role: Centralized search state and async workflow orchestration hook.
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { analytics } from '../analytics';
 import { normalizeSearchResult, type SearchResult } from '../shared/searchSchema';
 
+/**
+ * Use Product Search so this code stays predictable and easier to maintain.
+ *
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export function useProductSearch() {
   const [query, setQuery] = useState('');
   const [region, setRegion] = useState('Global');
@@ -21,10 +27,24 @@ export function useProductSearch() {
   const loadingTimeoutsRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   const searchAbortControllerRef = useRef<AbortController | null>(null);
 
+  /**
+   * Clears Loading Timers so this file stays easier to maintain for the next developer.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
+
   const clearLoadingTimers = () => {
     loadingTimeoutsRef.current.forEach((timer) => clearTimeout(timer));
     loadingTimeoutsRef.current = [];
   };
+
+  /**
+   * Starts Loading Progress so this file stays easier to maintain for the next developer.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
   const startLoadingProgress = () => {
     clearLoadingTimers();
@@ -42,6 +62,14 @@ export function useProductSearch() {
       searchAbortControllerRef.current?.abort();
     };
   }, []);
+
+  /**
+   * Maps Search Error Message so this file stays easier to maintain for the next developer.
+   *
+   * @param err - err provided by the caller to control this behavior.
+   * @returns The computed value this helper produces for downstream logic.
+   */
+
 
   const mapSearchErrorMessage = (err: unknown): string => {
     const status = typeof (err as { status?: unknown })?.status === 'number'
@@ -63,6 +91,16 @@ export function useProductSearch() {
     }
     return 'Something went wrong. Try a more specific product name.';
   };
+
+  /**
+   * Perform Search so this file stays easier to maintain for the next developer.
+   *
+   * @param queryToSearch - queryToSearch provided by the caller to control this behavior.
+   * @param regionToSearch - regionToSearch provided by the caller to control this behavior.
+   * @param source - source provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
   const performSearch = async (queryToSearch: string, regionToSearch: string, source: 'search' | 'image_search') => {
     const searchStartTime = Date.now();
@@ -140,6 +178,14 @@ export function useProductSearch() {
     }
   };
 
+  /**
+   * Handles Search so this file stays easier to maintain for the next developer.
+   *
+   * @param e - e provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
+
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault();
     const trimmedQuery = query.trim();
@@ -151,6 +197,14 @@ export function useProductSearch() {
     setQueryValidationError(null);
     await performSearch(trimmedQuery, region, 'search');
   };
+
+  /**
+   * Handles Image Upload so this file stays easier to maintain for the next developer.
+   *
+   * @param file - file provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
   const handleImageUpload = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -236,11 +290,25 @@ export function useProductSearch() {
 
   const detectedCurrency = result?.detectedCurrency || 'USD';
 
+  /**
+   * Clears Filters so this file stays easier to maintain for the next developer.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
+
   const clearFilters = () => {
     setMaxPrice('');
     setSelectedStore('All');
     setMinRating(0);
   };
+
+  /**
+   * Starts New Search so this file stays easier to maintain for the next developer.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
   const startNewSearch = () => {
     setResult(null);
@@ -281,3 +349,4 @@ export function useProductSearch() {
     handleImageUpload,
   };
 }
+

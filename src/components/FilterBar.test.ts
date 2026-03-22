@@ -1,3 +1,4 @@
+﻿// File role: Tests for filter control rendering and change callback behavior.
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -67,3 +68,4 @@ describe('FilterBar', () => {
     expect(onMinRatingChange).toHaveBeenCalledWith(4.5);
   });
 });
+

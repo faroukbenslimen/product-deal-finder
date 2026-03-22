@@ -1,3 +1,4 @@
+﻿// File role: Filter controls for price, store, and rating refinement.
 interface FilterBarProps {
   maxPrice: number | '';
   selectedStore: string;
@@ -9,6 +10,12 @@ interface FilterBarProps {
   onMinRatingChange: (value: number) => void;
 }
 
+/**
+ * Filter Bar so this file stays easier to maintain for the next developer.
+ *
+ * @param { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } - { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function FilterBar({
   maxPrice,
   selectedStore,
@@ -66,3 +73,4 @@ export default function FilterBar({
     </div>
   );
 }
+

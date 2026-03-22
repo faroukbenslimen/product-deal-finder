@@ -1,3 +1,4 @@
+﻿// File role: Top-level page composition for search, filters, and result presentation.
 import { type DragEvent as ReactDragEvent, useEffect, useState } from 'react';
 import { ShoppingBag, Star, AlertCircle, Filter, Camera, Heart, TrendingUp, ShieldCheck } from 'lucide-react';
 // Keep motion/react: this screen relies on coordinated enter/exit transitions and staggered card animations.
@@ -17,11 +18,23 @@ import { useProductSearch } from './hooks/useProductSearch';
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/640x420/e5e7eb/6b7280?text=No+Image';
 
+/**
+ * Gets Recommendation Key so this file stays easier to maintain for the next developer.
+ *
+ * @param rec - rec provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getRecommendationKey(rec: SearchResult['recommendations'][number]): string {
   const urlPart = rec.url?.trim() || rec.domain?.trim() || 'unknown';
   return `${rec.storeName}-${rec.productName}-${urlPart}`.toLowerCase();
 }
 
+/**
+ * Gets Deal Confidence so this file stays easier to maintain for the next developer.
+ *
+ * @param rec - rec provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getDealConfidence(rec: SearchResult['recommendations'][number]): number {
   if (rec.confidenceScore > 0) {
     return Math.min(100, Math.max(0, Math.round(rec.confidenceScore)));
@@ -34,12 +47,23 @@ function getDealConfidence(rec: SearchResult['recommendations'][number]): number
   return Math.min(100, Math.round(ratingFactor + prosFactor + stockFactor + shippingFactor + bestBonus));
 }
 
+/**
+ * Gets Confidence Tone so this file stays easier to maintain for the next developer.
+ *
+ * @param score - score provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getConfidenceTone(score: number): string {
   if (score >= 80) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
   if (score >= 60) return 'bg-amber-100 text-amber-800 border-amber-200';
   return 'bg-rose-100 text-rose-700 border-rose-200';
 }
 
+/**
+ * App so this code stays predictable and easier to maintain.
+ *
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function App() {
   const {
     query,
@@ -84,6 +108,14 @@ export default function App() {
     }
   }, [isLoading]);
 
+  /**
+   * Handles Sort so this file stays easier to maintain for the next developer.
+   *
+   * @param key - key provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
+
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -91,6 +123,15 @@ export default function App() {
     }
     setSortConfig({ key, direction });
   };
+
+
+  /**
+   * Handles Drag Drop so this file stays easier to maintain for the next developer.
+   *
+   * @param e - e provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
 
   const handleDragDrop = (e: ReactDragEvent<HTMLDivElement>) => {
@@ -101,6 +142,14 @@ export default function App() {
       handleImageUpload(files[0]);
     }
   };
+
+  /**
+   * Handles Drag Over so this file stays easier to maintain for the next developer.
+   *
+   * @param e - e provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
 
   const handleDragOver = (e: ReactDragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -147,7 +196,23 @@ export default function App() {
   const isTableView = viewMode === 'table' && result && filteredRecommendations.length > 0;
   const containerMaxWidth = isTableView ? 'max-w-[98vw] xl:max-w-[95vw] 2xl:max-w-[1800px]' : 'max-w-5xl';
 
+  /**
+   * Gets Recommendation Href so this file stays easier to maintain for the next developer.
+   *
+   * @param rec - rec provided by the caller to control this behavior.
+   * @returns The computed value this helper produces for downstream logic.
+   */
+
+
   const getRecommendationHref = (rec: SearchResult['recommendations'][number]) => getReliableRecommendationHref(rec, query);
+
+  /**
+   * Toggles Watchlist so this file stays easier to maintain for the next developer.
+   *
+   * @param rec - rec provided by the caller to control this behavior.
+   * @returns The computed value this helper produces for downstream logic.
+   */
+
 
   const toggleWatchlist = (rec: SearchResult['recommendations'][number]) => {
     const key = getRecommendationKey(rec);
@@ -519,3 +584,4 @@ export default function App() {
     </div>
   );
 }
+

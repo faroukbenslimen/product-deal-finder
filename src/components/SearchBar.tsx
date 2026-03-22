@@ -1,3 +1,4 @@
+﻿// File role: Search input and region selection form with inline validation UI.
 import { FormEvent } from 'react';
 import { Search, Globe, ChevronDown, Loader2 } from 'lucide-react';
 
@@ -12,6 +13,12 @@ interface SearchBarProps {
   onSubmit: (event: FormEvent) => void;
 }
 
+/**
+ * Search Bar so this file stays easier to maintain for the next developer.
+ *
+ * @param { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } - { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function SearchBar({
   query,
   region,
@@ -71,3 +78,4 @@ export default function SearchBar({
     </form>
   );
 }
+

@@ -1,3 +1,5 @@
+﻿// File role: Shared app constants used across frontend components.
+// This region list keeps user-facing geography options centralized and consistent across the app.
 export const REGIONS = [
   'Global',
   'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
@@ -25,3 +27,4 @@ export const REGIONS = [
   'Yemen',
   'Zambia', 'Zimbabwe'
 ];
+

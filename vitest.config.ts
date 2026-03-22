@@ -1,3 +1,4 @@
+﻿// File role: Vitest test runner configuration for unit and integration tests.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -6,3 +7,4 @@ export default defineConfig({
     environment: 'node',
   },
 });
+

@@ -1,3 +1,4 @@
+﻿// File role: Express API server for product search, validation, and provider fallback.
 import 'dotenv/config';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
@@ -63,6 +64,13 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(observabilityMiddleware);
 
+/**
+ * Serves GET / so clients can access this API capability in a predictable way.
+ *
+ * @route GET /
+ * @access Public
+ * @rateLimit No custom route limiter; this endpoint uses global middleware behavior.
+ */
 app.get('/', (_req: Request, res: Response) => {
   return res.json({
     service: 'product-deal-finder-api',
@@ -71,18 +79,40 @@ app.get('/', (_req: Request, res: Response) => {
   });
 });
 
+/**
+ * Serves GET /health so clients can access this API capability in a predictable way.
+ *
+ * @route GET /health
+ * @access Public
+ * @rateLimit No custom route limiter; this endpoint uses global middleware behavior.
+ */
 app.get('/health', (_req: Request, res: Response) => {
   return res.json({ status: 'ok' });
 });
 
+/**
+ * Serves GET /metrics so clients can access this API capability in a predictable way.
+ *
+ * @route GET /metrics
+ * @access Public
+ * @rateLimit No custom route limiter; this endpoint uses global middleware behavior.
+ */
 app.get('/metrics', (_req: Request, res: Response) => {
   return res.json({ metrics: getMetrics() });
 });
 
+/**
+ * Serves GET /metrics/search so clients can access this API capability in a predictable way.
+ *
+ * @route GET /metrics/search
+ * @access Public
+ * @rateLimit No custom route limiter; this endpoint uses global middleware behavior.
+ */
 app.get('/metrics/search', (_req: Request, res: Response) => {
   return res.json({ searchMetrics: getSearchMetrics() });
 });
 
+// These rate limiting and cooldown values work together to protect the API from bursts and abuse.
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 10;
 const IP_COOLDOWN_MS = 4_000;
@@ -92,6 +122,7 @@ const lastRequestByScope = new Map<string, number>();
 const domainLinkHealth = new Map<string, { success: number; failure: number }>();
 
 // Query cache: stores results for 6 hours.
+// These cache settings trade memory usage for lower latency and fewer repeated model calls.
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 500;
 interface CacheEntry {
@@ -105,6 +136,7 @@ const dailyUsage = {
   modelCalls: 0,
 };
 
+// These schemas enforce a consistent AI response shape before data reaches the UI.
 const specificationSchema = z.object({
   feature: z.string(),
   value: z.string(),
@@ -135,6 +167,12 @@ const modelResponseSchema = z.object({
   detectedCurrency: z.string().optional().default('USD'),
 }).strict();
 
+/**
+ * Gets Client Ip so this file stays easier to maintain for the next developer.
+ *
+ * @param req - req provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getClientIp(req: Request): string {
   const forwarded = req.headers['x-forwarded-for'];
   if (typeof forwarded === 'string' && forwarded.trim()) {
@@ -143,6 +181,12 @@ function getClientIp(req: Request): string {
   return req.ip || req.socket.remoteAddress || 'unknown';
 }
 
+/**
+ * Checks whether Rate Limited so this file stays easier to maintain for the next developer.
+ *
+ * @param ip - ip provided by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
+ */
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
   const windowStart = now - RATE_LIMIT_WINDOW_MS;
@@ -159,6 +203,13 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
+/**
+ * Checks whether In Cooldown so this file stays easier to maintain for the next developer.
+ *
+ * @param ip - ip provided by the caller to control this behavior.
+ * @param scope - scope provided by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
+ */
 function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: boolean; retryAfterMs: number } {
   const now = Date.now();
   const key = `${ip}::${scope}`;
@@ -173,6 +224,12 @@ function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: bool
   return { blocked: false, retryAfterMs: 0 };
 }
 
+/**
+ * Consume Daily Model Budget so this file stays easier to maintain for the next developer.
+ *
+ * @param units - units provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function consumeDailyModelBudget(units = 1): boolean {
   const currentDay = new Date().toISOString().slice(0, 10);
   if (dailyUsage.dayKey !== currentDay) {
@@ -188,6 +245,12 @@ function consumeDailyModelBudget(units = 1): boolean {
   return true;
 }
 
+/**
+ * Builds Repair Prompt so this file stays easier to maintain for the next developer.
+ *
+ * @param invalidText - invalidText provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function buildRepairPrompt(invalidText: string): string {
   return `You are a JSON repair assistant.
 
@@ -223,6 +286,12 @@ Input to repair:
 ${invalidText}`;
 }
 
+/**
+ * Extracts First Json Object so this file stays easier to maintain for the next developer.
+ *
+ * @param text - text provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function extractFirstJsonObject(text: string): string | null {
   const source = text.trim();
   const start = source.indexOf('{');
@@ -263,12 +332,26 @@ function extractFirstJsonObject(text: string): string | null {
   return null;
 }
 
+/**
+ * To Safe String so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param fallback - fallback provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeString(value: unknown, fallback = ''): string {
   if (typeof value === 'string') return value;
   if (typeof value === 'number' && Number.isFinite(value)) return String(value);
   return fallback;
 }
 
+/**
+ * To Safe Number so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param fallback - fallback provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string') {
@@ -278,6 +361,13 @@ function toSafeNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+/**
+ * To Safe Currency so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param fallback - fallback provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeCurrency(value: unknown, fallback = 'USD'): string {
   const raw = toSafeString(value, fallback).trim().toUpperCase();
   if (/^[A-Z]{3}$/.test(raw)) {
@@ -286,11 +376,23 @@ function toSafeCurrency(value: unknown, fallback = 'USD'): string {
   return fallback;
 }
 
+/**
+ * To Safe String Array so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.map((item) => toSafeString(item)).filter(Boolean).slice(0, 8);
 }
 
+/**
+ * To Safe Specifications so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeSpecifications(value: unknown): Array<{ feature: string; value: string }> {
   if (!Array.isArray(value)) return [];
   return value
@@ -306,6 +408,12 @@ function toSafeSpecifications(value: unknown): Array<{ feature: string; value: s
     .slice(0, 12);
 }
 
+/**
+ * Coerce Model Payload so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function coerceModelPayload(value: unknown): unknown {
   const rootCandidate = value && typeof value === 'object' ? value as Record<string, unknown> : {};
   const root = rootCandidate.data && typeof rootCandidate.data === 'object'
@@ -344,6 +452,12 @@ function coerceModelPayload(value: unknown): unknown {
   };
 }
 
+/**
+ * Parses And Validate Model Response so this file stays easier to maintain for the next developer.
+ *
+ * @param rawText - rawText provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function parseAndValidateModelResponse(rawText: string) {
   const cleanText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
 
@@ -367,6 +481,13 @@ function parseAndValidateModelResponse(rawText: string) {
   throw lastError instanceof Error ? lastError : new Error('Model response was not valid JSON.');
 }
 
+/**
+ * Builds Fallback Search Url so this file stays easier to maintain for the next developer.
+ *
+ * @param rec - rec provided by the caller to control this behavior.
+ * @param query - query provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
   const normalizedDomain = (rec.domain || '').trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
   const terms = [rec.productName || query, rec.storeName].filter(Boolean).join(' ');
@@ -374,6 +495,12 @@ function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
   return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
 }
 
+/**
+ * Tokenize so this file stays easier to maintain for the next developer.
+ *
+ * @param text - text provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
@@ -382,10 +509,23 @@ function tokenize(text: string): string[] {
     .filter((token) => token.length > 2);
 }
 
+/**
+ * Normalizes Host so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function normalizeHost(value: string): string {
   return value.toLowerCase().replace(/^www\./, '').trim();
 }
 
+/**
+ * Host Matches Domain so this file stays easier to maintain for the next developer.
+ *
+ * @param host - host provided by the caller to control this behavior.
+ * @param domain - domain provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function hostMatchesDomain(host: string, domain: string): boolean {
   const safeHost = normalizeHost(host);
   const safeDomain = normalizeHost(domain);
@@ -393,6 +533,12 @@ function hostMatchesDomain(host: string, domain: string): boolean {
   return safeHost === safeDomain || safeHost.endsWith(`.${safeDomain}`);
 }
 
+/**
+ * Checks whether Likely Cdn Host so this file stays easier to maintain for the next developer.
+ *
+ * @param host - host provided by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
+ */
 function isLikelyCdnHost(host: string): boolean {
   const safeHost = normalizeHost(host);
   return (
@@ -403,6 +549,13 @@ function isLikelyCdnHost(host: string): boolean {
   );
 }
 
+/**
+ * Evaluate Url Quality so this file stays easier to maintain for the next developer.
+ *
+ * @param rec - rec provided by the caller to control this behavior.
+ * @param query - query provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function evaluateUrlQuality(rec: Recommendation, query: string): { score: number; useDirect: boolean } {
   if (!rec.url) {
     return { score: 35, useDirect: false };
@@ -456,6 +609,13 @@ function evaluateUrlQuality(rec: Recommendation, query: string): { score: number
   return { score, useDirect: score >= 70 };
 }
 
+/**
+ * Sets Link Health so this file stays easier to maintain for the next developer.
+ *
+ * @param hostname - hostname provided by the caller to control this behavior.
+ * @param success - success provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function setLinkHealth(hostname: string, success: boolean): void {
   if (!hostname) return;
   const current = domainLinkHealth.get(hostname) || { success: 0, failure: 0 };
@@ -464,12 +624,25 @@ function setLinkHealth(hostname: string, success: boolean): void {
   domainLinkHealth.set(hostname, current);
 }
 
+/**
+ * Level From Score so this file stays easier to maintain for the next developer.
+ *
+ * @param score - score provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function levelFromScore(score: number): 'low' | 'medium' | 'high' {
   if (score >= 75) return 'high';
   if (score >= 50) return 'medium';
   return 'low';
 }
 
+/**
+ * Apply Link Fixes And Ranking so this file stays easier to maintain for the next developer.
+ *
+ * @param recs - recs provided by the caller to control this behavior.
+ * @param query - query provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recommendation[] {
   return recs.map((rec) => {
     const domain = (rec.domain || '').trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -501,6 +674,13 @@ function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recomm
   });
 }
 
+/**
+ * Fetches Model Content so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 async function fetchModelContent(query: string, region: string): Promise<string> {
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
@@ -517,6 +697,12 @@ async function fetchModelContent(query: string, region: string): Promise<string>
   return response.text;
 }
 
+/**
+ * Should Try Fallback Provider so this file stays easier to maintain for the next developer.
+ *
+ * @param error - error provided by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
+ */
 function shouldTryFallbackProvider(error: unknown): boolean {
   const message = String((error as any)?.message || '').toLowerCase();
   const status = (error as any)?.status;
@@ -533,6 +719,12 @@ function shouldTryFallbackProvider(error: unknown): boolean {
   );
 }
 
+/**
+ * Fetches Model Content From Open Router so this file stays easier to maintain for the next developer.
+ *
+ * @param prompt - prompt provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> {
   if (!openRouterApiKey) {
     throw new Error('OpenRouter fallback is not configured.');
@@ -572,6 +764,13 @@ async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> 
   return text.trim();
 }
 
+/**
+ * Fetches Model Content With Fallback so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 async function fetchModelContentWithFallback(query: string, region: string): Promise<{ text: string; provider: 'gemini' | 'openrouter' }> {
   try {
     const text = await fetchModelContent(query, region);
@@ -585,6 +784,12 @@ async function fetchModelContentWithFallback(query: string, region: string): Pro
   }
 }
 
+/**
+ * Repair Model Content so this file stays easier to maintain for the next developer.
+ *
+ * @param invalidText - invalidText provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 async function repairModelContent(invalidText: string): Promise<string> {
   try {
     const response = await ai.models.generateContent({
@@ -605,6 +810,13 @@ async function repairModelContent(invalidText: string): Promise<string> {
   }
 }
 
+/**
+ * Gets Cache Key so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getCacheKey(query: string, region: string): string {
   const normalizedQuery = query
     .normalize('NFKC')
@@ -620,6 +832,13 @@ function getCacheKey(query: string, region: string): string {
   return `${normalizedQuery}|||${normalizedRegion}`;
 }
 
+/**
+ * Gets Cached Result so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function getCachedResult(query: string, region: string): CacheEntry | null {
   const key = getCacheKey(query, region);
   const entry = queryCache.get(key);
@@ -634,6 +853,14 @@ function getCachedResult(query: string, region: string): CacheEntry | null {
   return entry;
 }
 
+/**
+ * Sets Cached Result so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @param result - result provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function setCachedResult(query: string, region: string, result: CacheEntry['result']): void {
   const key = getCacheKey(query, region);
   if (queryCache.size >= MAX_CACHE_ENTRIES) {
@@ -652,6 +879,13 @@ function setCachedResult(query: string, region: string, result: CacheEntry['resu
   queryCache.set(key, { result, timestamp: Date.now() });
 }
 
+/**
+ * Serves POST /api/search so clients can access this API capability in a predictable way.
+ *
+ * @route POST /api/search
+ * @access Public
+ * @rateLimit Uses the shared API rate limiter and per-IP cooldown in server middleware.
+ */
 app.post('/api/search', async (req: Request, res: Response) => {
   const ip = getClientIp(req);
   const cooldown = isInCooldown(ip, 'search');
@@ -744,6 +978,13 @@ app.post('/api/search', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Serves POST /api/identify-product so clients can access this API capability in a predictable way.
+ *
+ * @route POST /api/identify-product
+ * @access Public
+ * @rateLimit Uses the shared API rate limiter and per-IP cooldown in server middleware.
+ */
 app.post('/api/identify-product', async (req: Request, res: Response) => {
   const ip = getClientIp(req);
   const cooldown = isInCooldown(ip, 'identify');
@@ -825,3 +1066,4 @@ app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
 app.listen(port, () => {
   console.log(`Deal Finder API running on http://localhost:${port}`);
 });
+

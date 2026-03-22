@@ -1,3 +1,4 @@
+﻿// File role: API observability middleware for request metrics and latency tracking.
 /**
  * Observability middleware for request tracking and metrics collection
  */
@@ -18,6 +19,14 @@ interface RequestMetrics {
 const metricsStore: RequestMetrics[] = [];
 const MAX_METRICS = 1000;
 
+/**
+ * Observability Middleware so this file stays easier to maintain for the next developer.
+ *
+ * @param req - req provided by the caller to control this behavior.
+ * @param res - res provided by the caller to control this behavior.
+ * @param next - next provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export function observabilityMiddleware(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();
 
@@ -59,7 +68,9 @@ export function observabilityMiddleware(req: Request, res: Response, next: NextF
 }
 
 /**
- * Get current metrics (for debugging/monitoring)
+ * Get Metrics so this code stays predictable and easier to maintain.
+ *
+ * @returns The computed value this function returns for downstream logic.
  */
 export function getMetrics() {
   const totalRequests = metricsStore.length;
@@ -79,7 +90,9 @@ export function getMetrics() {
 }
 
 /**
- * Get search-specific metrics
+ * Get Search Metrics so this code stays predictable and easier to maintain.
+ *
+ * @returns The computed value this function returns for downstream logic.
  */
 export function getSearchMetrics() {
   const searchMetrics = metricsStore.filter((m) => m.path.includes('/api/search'));
@@ -106,3 +119,4 @@ export function getSearchMetrics() {
     emptyResultRate: ((emptyResults / searchMetrics.length) * 100).toFixed(2),
   };
 }
+

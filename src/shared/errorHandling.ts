@@ -1,3 +1,4 @@
+﻿// File role: Error classification helpers used by API and UI mapping layers.
 export interface ErrorInfo {
   status: number;
   message: string;
@@ -6,8 +7,10 @@ export interface ErrorInfo {
 }
 
 /**
- * Detects if an error is a Gemini API quota/rate limit error.
- * Handles multiple error formats from the Google AI SDK.
+ * Is Quota Error so this code stays predictable and easier to maintain.
+ *
+ * @param error - error passed by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
  */
 export function isQuotaError(error: any): boolean {
   if (!error) return false;
@@ -24,8 +27,10 @@ export function isQuotaError(error: any): boolean {
 }
 
 /**
- * Detects temporary provider overload/capacity errors.
- * Covers common formats from AI providers and gateway wrappers.
+ * Is Temporary Overload Error so this code stays predictable and easier to maintain.
+ *
+ * @param error - error passed by the caller to control this behavior.
+ * @returns True when the condition is met so callers can branch safely.
  */
 export function isTemporaryOverloadError(error: any): boolean {
   if (!error) return false;
@@ -44,8 +49,10 @@ export function isTemporaryOverloadError(error: any): boolean {
 }
 
 /**
- * Classifies error and returns standardized error info for API responses.
- * Used on the backend to return consistent error responses.
+ * Classify Error so this code stays predictable and easier to maintain.
+ *
+ * @param error - error passed by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
  */
 export function classifyError(error: any): ErrorInfo {
   const isQuota = isQuotaError(error);
@@ -64,8 +71,10 @@ export function classifyError(error: any): ErrorInfo {
 }
 
 /**
- * Generates user-friendly error message for frontend display.
- * Provides context-specific messaging for quota vs other errors.
+ * Get User Friendly Error Message so this code stays predictable and easier to maintain.
+ *
+ * @param error - error passed by the caller to control this behavior.
+ * @returns The computed value this function returns for downstream logic.
  */
 export function getUserFriendlyErrorMessage(error: any): string {
   const isQuota = isQuotaError(error);
@@ -88,3 +97,4 @@ export function getUserFriendlyErrorMessage(error: any): string {
   
   return error?.message || 'An error occurred. Please try again.';
 }
+

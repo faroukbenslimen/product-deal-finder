@@ -1,3 +1,4 @@
+﻿// File role: Tests for search response normalization and schema fallback behavior.
 import { describe, expect, it } from 'vitest';
 import { normalizeSearchResult } from './searchSchema';
 
@@ -128,3 +129,4 @@ describe('normalizeSearchResult smoke paths', () => {
     expect(missingCurrency.detectedCurrency).toBe('USD');
   });
 });
+

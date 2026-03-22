@@ -1,3 +1,4 @@
+﻿// File role: Tests for URL normalization and direct/fallback link behavior.
 import { describe, expect, it } from 'vitest';
 import { getDirectRecommendationHref, getReliableRecommendationHref } from './linkUtils';
 
@@ -104,3 +105,4 @@ describe('linkUtils', () => {
     }
   });
 });
+

@@ -1,3 +1,4 @@
+﻿// File role: Runtime-safe normalization and typing for AI search responses.
 export interface Specification {
   feature: string;
   value: string;
@@ -40,6 +41,13 @@ export interface NormalizeOptions {
 
 const MAX_TEXT_LENGTH = 500;
 
+/**
+ * To Safe String so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param fallback - fallback provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeString(value: unknown, fallback = ''): string {
   if (typeof value !== 'string') {
     return fallback;
@@ -47,6 +55,13 @@ function toSafeString(value: unknown, fallback = ''): string {
   return value.trim().slice(0, MAX_TEXT_LENGTH);
 }
 
+/**
+ * To Safe Number so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param fallback - fallback provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toSafeNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
@@ -60,6 +75,12 @@ function toSafeNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+/**
+ * To String Array so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -70,6 +91,12 @@ function toStringArray(value: unknown): string[] {
     .slice(0, 8);
 }
 
+/**
+ * Sanitize Url so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function sanitizeUrl(value: unknown): string {
   const raw = toSafeString(value);
   if (!raw) {
@@ -89,11 +116,23 @@ function sanitizeUrl(value: unknown): string {
   }
 }
 
+/**
+ * Sanitize Domain so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 function sanitizeDomain(value: unknown): string {
   const domain = toSafeString(value).replace(/^https?:\/\//, '').replace(/\/.*$/, '');
   return domain;
 }
 
+/**
+ * Normalizes Specifications so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function normalizeSpecifications(value: unknown): Specification[] {
   if (!Array.isArray(value)) {
     return [];
@@ -115,6 +154,12 @@ function normalizeSpecifications(value: unknown): Specification[] {
     .slice(0, 12);
 }
 
+/**
+ * Normalizes Recommendation so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 function normalizeRecommendation(value: unknown): Recommendation {
   const rec = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
 
@@ -182,6 +227,13 @@ function normalizeRecommendation(value: unknown): Recommendation {
   };
 }
 
+/**
+ * Normalizes Search Result so this file stays easier to maintain for the next developer.
+ *
+ * @param value - value provided by the caller to control this behavior.
+ * @param options - options provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 export function normalizeSearchResult(value: unknown, options: NormalizeOptions = {}): SearchResult {
   const root = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
   const recommendationsRaw = Array.isArray(root.recommendations) ? root.recommendations : [];
@@ -213,3 +265,4 @@ export function normalizeSearchResult(value: unknown, options: NormalizeOptions 
     detectedCurrency: /^[A-Z]{3}$/.test(detectedCurrency) ? detectedCurrency : 'USD',
   };
 }
+

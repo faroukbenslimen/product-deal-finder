@@ -1,3 +1,4 @@
+﻿// File role: Server endpoint tests for search flow, errors, and response shape.
 /**
  * API Integration Tests for product-deal-finder backend
  * Run with: npm test
@@ -6,7 +7,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 /**
- * Test helper: Fetch API endpoint
+ * Fetch Api so this code stays predictable and easier to maintain.
+ *
+ * @param method - method passed by the caller to control this behavior.
+ * @param path - path passed by the caller to control this behavior.
+ * @param body - body passed by the caller to control this behavior.
+ * @returns The computed value this function returns for downstream logic.
  */
 async function fetchApi(method: string, path: string, body?: any) {
   const baseUrl = process.env.API_URL || 'http://localhost:4000';
@@ -266,3 +272,4 @@ describe('Product Deal Finder API', () => {
     });
   });
 });
+

@@ -1,3 +1,4 @@
+﻿// File role: Vite build/dev server configuration, including API proxy setup.
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -21,3 +22,4 @@ export default defineConfig(({mode}) => {
     },
   };
 });
+

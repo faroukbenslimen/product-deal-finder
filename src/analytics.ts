@@ -1,3 +1,4 @@
+﻿// File role: Frontend analytics wrapper for tracking key user interactions.
 /**
  * Frontend Analytics Utility
  * Tracks user interactions and sends events (can integrate with Google Analytics, Vercel Analytics, etc.)
@@ -16,21 +17,36 @@ class Analytics {
   private eventQueue: AnalyticsEvent[] = [];
   private isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
-  constructor() {
+    /**
+   * Constructor so this code stays predictable and easier to maintain.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+constructor() {
     // Initialize with your analytics provider here
     // Example: Google Analytics, Vercel Analytics, Mixpanel, etc.
     this.initializeProvider();
   }
 
-  private initializeProvider(): void {
+    /**
+ * Initialize Provider so this code stays predictable and easier to maintain.
+ *
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
+private initializeProvider(): void {
     // Vercel Analytics is enabled via <Analytics /> in main.tsx.
     if (this.isDev) {
       console.log('[Analytics] Initialized with Vercel Analytics (dev mode)');
     }
   }
 
-  /**
-   * Track a search event
+    /**
+   * Track Search so this code stays predictable and easier to maintain.
+   *
+   * @param query - query passed by the caller to control this behavior.
+   * @param region - region passed by the caller to control this behavior.
+   * @param resultCount - resultCount passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackSearch(query: string, region: string, resultCount: number): void {
     this.trackEvent('search', {
@@ -40,8 +56,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Track image upload
+    /**
+   * Track Image Upload so this code stays predictable and easier to maintain.
+   *
+   * @param size - size passed by the caller to control this behavior.
+   * @param success - success passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackImageUpload(size: number, success: boolean): void {
     this.trackEvent('image_upload', {
@@ -50,8 +70,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Track deal click
+    /**
+   * Track Deal Click so this code stays predictable and easier to maintain.
+   *
+   * @param storeName - storeName passed by the caller to control this behavior.
+   * @param isBest - isBest passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackDealClick(storeName: string, isBest: boolean): void {
     this.trackEvent('deal_click', {
@@ -60,8 +84,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Track watchlist action
+    /**
+   * Track Watchlist Action so this code stays predictable and easier to maintain.
+   *
+   * @param action - action passed by the caller to control this behavior.
+   * @param storeName - storeName passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackWatchlistAction(action: 'add' | 'remove', storeName: string): void {
     this.trackEvent('watchlist_action', {
@@ -70,8 +98,11 @@ class Analytics {
     });
   }
 
-  /**
-   * Track filter usage
+    /**
+   * Track Filter Usage so this code stays predictable and easier to maintain.
+   *
+   * @param filterType - filterType passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackFilterUsage(filterType: 'price' | 'store' | 'rating'): void {
     this.trackEvent('filter_used', {
@@ -79,8 +110,11 @@ class Analytics {
     });
   }
 
-  /**
-   * Track view mode switch
+    /**
+   * Track View Mode Switch so this code stays predictable and easier to maintain.
+   *
+   * @param mode - mode passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackViewModeSwitch(mode: 'cards' | 'table'): void {
     this.trackEvent('view_mode_switch', {
@@ -88,8 +122,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Track error
+    /**
+   * Track Error so this code stays predictable and easier to maintain.
+   *
+   * @param errorMessage - errorMessage passed by the caller to control this behavior.
+   * @param context - context passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackError(errorMessage: string, context?: string): void {
     this.trackEvent('error_occurred', {
@@ -98,8 +136,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Track page timing
+    /**
+   * Track Timing so this code stays predictable and easier to maintain.
+   *
+   * @param operation - operation passed by the caller to control this behavior.
+   * @param duration - duration passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   trackTiming(operation: string, duration: number): void {
     this.trackEvent('timing', {
@@ -108,8 +150,12 @@ class Analytics {
     });
   }
 
-  /**
-   * Generic event tracking
+    /**
+   * Track Event so this code stays predictable and easier to maintain.
+   *
+   * @param name - name passed by the caller to control this behavior.
+   * @param properties - properties passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   private trackEvent(name: string, properties?: Record<string, string | number | boolean>): void {
     if (!this.isEnabled) return;
@@ -134,8 +180,10 @@ class Analytics {
     this.flushIfNeeded();
   }
 
-  /**
-   * Flush events when queue reaches threshold
+    /**
+   * Flush If Needed so this code stays predictable and easier to maintain.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   private flushIfNeeded(): void {
     if (this.eventQueue.length >= 10) {
@@ -143,8 +191,10 @@ class Analytics {
     }
   }
 
-  /**
-   * Send all queued events to backend
+    /**
+   * Flush so this code stays predictable and easier to maintain.
+   *
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   flush(): void {
     if (this.eventQueue.length === 0) return;
@@ -165,8 +215,11 @@ class Analytics {
     }
   }
 
-  /**
-   * Set user properties (optional)
+    /**
+   * Set User Properties so this code stays predictable and easier to maintain.
+   *
+   * @param properties - properties passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   setUserProperties(properties: Record<string, string | number | boolean>): void {
     // Store user properties for all future events
@@ -175,8 +228,11 @@ class Analytics {
     }
   }
 
-  /**
-   * Enable/disable analytics
+    /**
+   * Set Enabled so this code stays predictable and easier to maintain.
+   *
+   * @param enabled - enabled passed by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
    */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled;
@@ -195,3 +251,4 @@ if (typeof window !== 'undefined') {
     analytics.flush();
   });
 }
+

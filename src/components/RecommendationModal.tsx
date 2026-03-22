@@ -1,3 +1,4 @@
+﻿// File role: Expanded recommendation detail modal with links and specifications.
 import { CheckCircle2, ExternalLink, XCircle } from 'lucide-react';
 // Keep motion/react here for modal mount/unmount choreography and backdrop/content synchronization.
 import { motion, AnimatePresence } from 'motion/react';
@@ -11,6 +12,12 @@ interface RecommendationModalProps {
   onClose: () => void;
 }
 
+/**
+ * Recommendation Modal so this file stays easier to maintain for the next developer.
+ *
+ * @param { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } - { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function RecommendationModal({
   recommendation,
   placeholderImage,
@@ -155,3 +162,4 @@ export default function RecommendationModal({
     </AnimatePresence>
   );
 }
+

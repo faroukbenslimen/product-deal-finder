@@ -1,3 +1,11 @@
+﻿// File role: Prompt builder that defines the structured AI search output contract.
+/**
+ * Builds Search Prompt so this file stays easier to maintain for the next developer.
+ *
+ * @param query - query provided by the caller to control this behavior.
+ * @param region - region provided by the caller to control this behavior.
+ * @returns The computed value this helper produces for downstream logic.
+ */
 export function buildSearchPrompt(query: string, region: string): string {
   const regionContext =
     region !== 'Global'
@@ -48,3 +56,4 @@ If fewer than 3 trustworthy stores are actually available for ${region}, you may
 
 CRITICAL URL INSTRUCTION: DO NOT GUESS OR CONSTRUCT URLs. If you do not have the EXACT, VERIFIED url directly from your search results, you MUST leave the 'url' field EMPTY ("").`;
 }
+

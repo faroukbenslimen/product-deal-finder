@@ -1,3 +1,4 @@
+﻿// File role: Frontend entry point that mounts the React application.
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Analytics} from '@vercel/analytics/react';
@@ -10,3 +11,4 @@ createRoot(document.getElementById('root')!).render(
     <Analytics />
   </StrictMode>,
 );
+

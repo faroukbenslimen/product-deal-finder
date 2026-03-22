@@ -1,3 +1,4 @@
+﻿// File role: Sortable table view for side-by-side recommendation comparison.
 import { ArrowUpDown, ChevronDown, ChevronUp, ExternalLink, Star } from 'lucide-react';
 import { type Recommendation } from '../shared/searchSchema';
 
@@ -17,6 +18,12 @@ interface ComparisonTableProps {
   getDirectHref: (rec: Recommendation) => string;
 }
 
+/**
+ * Comparison Table so this file stays easier to maintain for the next developer.
+ *
+ * @param { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } - { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } provided by the caller to control this behavior.
+ * @returns Nothing meaningful; this function exists for side effects and flow control.
+ */
 export default function ComparisonTable({
   sortedRecommendations,
   allSpecKeys,
@@ -27,6 +34,13 @@ export default function ComparisonTable({
   getRecommendationHref,
   getDirectHref,
 }: ComparisonTableProps) {
+  /**
+   * Sort Icon so this file stays easier to maintain for the next developer.
+   *
+   * @param columnKey - columnKey provided by the caller to control this behavior.
+   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   */
+
   const sortIcon = (columnKey: string) => {
     if (sortConfig?.key !== columnKey) {
       return <ArrowUpDown className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />;
@@ -142,3 +156,4 @@ export default function ComparisonTable({
     </div>
   );
 }
+
