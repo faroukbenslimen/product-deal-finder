@@ -20,7 +20,7 @@ class Analytics {
     /**
    * Constructor so this code stays predictable and easier to maintain.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 constructor() {
     // Initialize with your analytics provider here
@@ -31,7 +31,7 @@ constructor() {
     /**
  * Initialize Provider so this code stays predictable and easier to maintain.
  *
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @returnsVoid.
  */
 private initializeProvider(): void {
     // Vercel Analytics is enabled via <Analytics /> in main.tsx.
@@ -46,7 +46,7 @@ private initializeProvider(): void {
    * @param query - query passed by the caller to control this behavior.
    * @param region - region passed by the caller to control this behavior.
    * @param resultCount - resultCount passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackSearch(query: string, region: string, resultCount: number): void {
     this.trackEvent('search', {
@@ -61,7 +61,7 @@ private initializeProvider(): void {
    *
    * @param size - size passed by the caller to control this behavior.
    * @param success - success passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackImageUpload(size: number, success: boolean): void {
     this.trackEvent('image_upload', {
@@ -75,7 +75,7 @@ private initializeProvider(): void {
    *
    * @param storeName - storeName passed by the caller to control this behavior.
    * @param isBest - isBest passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackDealClick(storeName: string, isBest: boolean): void {
     this.trackEvent('deal_click', {
@@ -89,7 +89,7 @@ private initializeProvider(): void {
    *
    * @param action - action passed by the caller to control this behavior.
    * @param storeName - storeName passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackWatchlistAction(action: 'add' | 'remove', storeName: string): void {
     this.trackEvent('watchlist_action', {
@@ -102,7 +102,7 @@ private initializeProvider(): void {
    * Track Filter Usage so this code stays predictable and easier to maintain.
    *
    * @param filterType - filterType passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackFilterUsage(filterType: 'price' | 'store' | 'rating'): void {
     this.trackEvent('filter_used', {
@@ -114,7 +114,7 @@ private initializeProvider(): void {
    * Track View Mode Switch so this code stays predictable and easier to maintain.
    *
    * @param mode - mode passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackViewModeSwitch(mode: 'cards' | 'table'): void {
     this.trackEvent('view_mode_switch', {
@@ -127,7 +127,7 @@ private initializeProvider(): void {
    *
    * @param errorMessage - errorMessage passed by the caller to control this behavior.
    * @param context - context passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackError(errorMessage: string, context?: string): void {
     this.trackEvent('error_occurred', {
@@ -141,7 +141,7 @@ private initializeProvider(): void {
    *
    * @param operation - operation passed by the caller to control this behavior.
    * @param duration - duration passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   trackTiming(operation: string, duration: number): void {
     this.trackEvent('timing', {
@@ -155,7 +155,7 @@ private initializeProvider(): void {
    *
    * @param name - name passed by the caller to control this behavior.
    * @param properties - properties passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   private trackEvent(name: string, properties?: Record<string, string | number | boolean>): void {
     if (!this.isEnabled) return;
@@ -183,7 +183,7 @@ private initializeProvider(): void {
     /**
    * Flush If Needed so this code stays predictable and easier to maintain.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   private flushIfNeeded(): void {
     if (this.eventQueue.length >= 10) {
@@ -194,7 +194,7 @@ private initializeProvider(): void {
     /**
    * Flush so this code stays predictable and easier to maintain.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   flush(): void {
     if (this.eventQueue.length === 0) return;
@@ -219,7 +219,7 @@ private initializeProvider(): void {
    * Set User Properties so this code stays predictable and easier to maintain.
    *
    * @param properties - properties passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   setUserProperties(properties: Record<string, string | number | boolean>): void {
     // Store user properties for all future events
@@ -232,7 +232,7 @@ private initializeProvider(): void {
    * Set Enabled so this code stays predictable and easier to maintain.
    *
    * @param enabled - enabled passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled;

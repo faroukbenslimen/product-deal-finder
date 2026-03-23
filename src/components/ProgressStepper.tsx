@@ -16,10 +16,10 @@ const STEPS = [
 ];
 
 /**
- * Progress Stepper so this file stays easier to maintain for the next developer.
+ * Progress Stepper.
  *
- * @param { activeStep } - { activeStep } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { activeStep } - { activeStep }supplied by the caller.
+ * @returnsVoid.
  */
 export default function ProgressStepper({ activeStep }: ProgressStepperProps) {
   return (

@@ -13,10 +13,10 @@ interface RecommendationModalProps {
 }
 
 /**
- * Recommendation Modal so this file stays easier to maintain for the next developer.
+ * Recommendation Modal.
  *
- * @param { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } - { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } - { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, }supplied by the caller.
+ * @returnsVoid.
  */
 export default function RecommendationModal({
   recommendation,

@@ -20,12 +20,12 @@ const metricsStore: RequestMetrics[] = [];
 const MAX_METRICS = 1000;
 
 /**
- * Observability Middleware so this file stays easier to maintain for the next developer.
+ * Observability Middleware.
  *
- * @param req - req provided by the caller to control this behavior.
- * @param res - res provided by the caller to control this behavior.
- * @param next - next provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param req - reqsupplied by the caller.
+ * @param res - ressupplied by the caller.
+ * @param next - nextsupplied by the caller.
+ * @returnsVoid.
  */
 export function observabilityMiddleware(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();

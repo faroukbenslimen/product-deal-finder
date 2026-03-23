@@ -1,9 +1,9 @@
 ﻿// File role: Prompt builder that defines the structured AI search output contract.
 /**
- * Builds Search Prompt so this file stays easier to maintain for the next developer.
+ * Builds Search Prompt.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 export function buildSearchPrompt(query: string, region: string): string {

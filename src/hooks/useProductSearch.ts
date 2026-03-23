@@ -6,7 +6,7 @@ import { normalizeSearchResult, type SearchResult } from '../shared/searchSchema
 /**
  * Use Product Search so this code stays predictable and easier to maintain.
  *
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @returnsVoid.
  */
 export function useProductSearch() {
   const [query, setQuery] = useState('');
@@ -28,9 +28,9 @@ export function useProductSearch() {
   const searchAbortControllerRef = useRef<AbortController | null>(null);
 
   /**
-   * Clears Loading Timers so this file stays easier to maintain for the next developer.
+   * Clears Loading Timers.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 
 
@@ -40,9 +40,9 @@ export function useProductSearch() {
   };
 
   /**
-   * Starts Loading Progress so this file stays easier to maintain for the next developer.
+   * Starts Loading Progress.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 
 
@@ -64,9 +64,9 @@ export function useProductSearch() {
   }, []);
 
   /**
-   * Maps Search Error Message so this file stays easier to maintain for the next developer.
+   * Maps Search Error Message.
    *
-   * @param err - err provided by the caller to control this behavior.
+   * @param err - errsupplied by the caller.
    * @returns The computed value this helper produces for downstream logic.
    */
 
@@ -93,12 +93,12 @@ export function useProductSearch() {
   };
 
   /**
-   * Perform Search so this file stays easier to maintain for the next developer.
+   * Perform Search.
    *
-   * @param queryToSearch - queryToSearch provided by the caller to control this behavior.
-   * @param regionToSearch - regionToSearch provided by the caller to control this behavior.
-   * @param source - source provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param queryToSearch - queryToSearchsupplied by the caller.
+   * @param regionToSearch - regionToSearchsupplied by the caller.
+   * @param source - sourcesupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -179,10 +179,10 @@ export function useProductSearch() {
   };
 
   /**
-   * Handles Search so this file stays easier to maintain for the next developer.
+   * Handles Search.
    *
-   * @param e - e provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param e - esupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -199,10 +199,10 @@ export function useProductSearch() {
   };
 
   /**
-   * Handles Image Upload so this file stays easier to maintain for the next developer.
+   * Handles Image Upload.
    *
-   * @param file - file provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param file - filesupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -291,9 +291,9 @@ export function useProductSearch() {
   const detectedCurrency = result?.detectedCurrency || 'USD';
 
   /**
-   * Clears Filters so this file stays easier to maintain for the next developer.
+   * Clears Filters.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 
 
@@ -304,9 +304,9 @@ export function useProductSearch() {
   };
 
   /**
-   * Starts New Search so this file stays easier to maintain for the next developer.
+   * Starts New Search.
    *
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 
 

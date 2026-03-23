@@ -19,10 +19,10 @@ interface ComparisonTableProps {
 }
 
 /**
- * Comparison Table so this file stays easier to maintain for the next developer.
+ * Comparison Table.
  *
- * @param { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } - { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } - { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, }supplied by the caller.
+ * @returnsVoid.
  */
 export default function ComparisonTable({
   sortedRecommendations,
@@ -35,10 +35,10 @@ export default function ComparisonTable({
   getDirectHref,
 }: ComparisonTableProps) {
   /**
-   * Sort Icon so this file stays easier to maintain for the next developer.
+   * Sort Icon.
    *
-   * @param columnKey - columnKey provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param columnKey - columnKeysupplied by the caller.
+   * @returnsVoid.
    */
 
   const sortIcon = (columnKey: string) => {

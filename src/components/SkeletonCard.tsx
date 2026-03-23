@@ -2,7 +2,7 @@
 /**
  * Skeleton Card so this code stays predictable and easier to maintain.
  *
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @returnsVoid.
  */
 export default function SkeletonCard() {
   return (

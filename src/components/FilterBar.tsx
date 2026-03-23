@@ -11,10 +11,10 @@ interface FilterBarProps {
 }
 
 /**
- * Filter Bar so this file stays easier to maintain for the next developer.
+ * Filter Bar.
  *
- * @param { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } - { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } - { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, }supplied by the caller.
+ * @returnsVoid.
  */
 export default function FilterBar({
   maxPrice,

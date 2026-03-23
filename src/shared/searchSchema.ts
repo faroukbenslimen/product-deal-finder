@@ -42,10 +42,10 @@ export interface NormalizeOptions {
 const MAX_TEXT_LENGTH = 500;
 
 /**
- * To Safe String so this file stays easier to maintain for the next developer.
+ * To Safe String.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param fallback - fallback provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param fallback - fallbacksupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeString(value: unknown, fallback = ''): string {
@@ -56,10 +56,10 @@ function toSafeString(value: unknown, fallback = ''): string {
 }
 
 /**
- * To Safe Number so this file stays easier to maintain for the next developer.
+ * To Safe Number.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param fallback - fallback provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param fallback - fallbacksupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeNumber(value: unknown, fallback = 0): number {
@@ -76,9 +76,9 @@ function toSafeNumber(value: unknown, fallback = 0): number {
 }
 
 /**
- * To String Array so this file stays easier to maintain for the next developer.
+ * To String Array.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toStringArray(value: unknown): string[] {
@@ -92,10 +92,10 @@ function toStringArray(value: unknown): string[] {
 }
 
 /**
- * Sanitize Url so this file stays easier to maintain for the next developer.
+ * Sanitize Url.
  *
- * @param value - value provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param value - valuesupplied by the caller.
+ * @returnsVoid.
  */
 function sanitizeUrl(value: unknown): string {
   const raw = toSafeString(value);
@@ -117,10 +117,10 @@ function sanitizeUrl(value: unknown): string {
 }
 
 /**
- * Sanitize Domain so this file stays easier to maintain for the next developer.
+ * Sanitize Domain.
  *
- * @param value - value provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param value - valuesupplied by the caller.
+ * @returnsVoid.
  */
 function sanitizeDomain(value: unknown): string {
   const domain = toSafeString(value).replace(/^https?:\/\//, '').replace(/\/.*$/, '');
@@ -128,9 +128,9 @@ function sanitizeDomain(value: unknown): string {
 }
 
 /**
- * Normalizes Specifications so this file stays easier to maintain for the next developer.
+ * Normalizes Specifications.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function normalizeSpecifications(value: unknown): Specification[] {
@@ -155,9 +155,9 @@ function normalizeSpecifications(value: unknown): Specification[] {
 }
 
 /**
- * Normalizes Recommendation so this file stays easier to maintain for the next developer.
+ * Normalizes Recommendation.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function normalizeRecommendation(value: unknown): Recommendation {
@@ -228,10 +228,10 @@ function normalizeRecommendation(value: unknown): Recommendation {
 }
 
 /**
- * Normalizes Search Result so this file stays easier to maintain for the next developer.
+ * Normalizes Search Result.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param options - options provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param options - optionssupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 export function normalizeSearchResult(value: unknown, options: NormalizeOptions = {}): SearchResult {

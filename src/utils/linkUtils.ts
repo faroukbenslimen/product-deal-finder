@@ -8,9 +8,9 @@ export interface LinkInput {
 }
 
 /**
- * Checks whether Likely Cdn Host so this file stays easier to maintain for the next developer.
+ * Checks whether Likely Cdn Host.
  *
- * @param hostname - hostname provided by the caller to control this behavior.
+ * @param hostname - hostnamesupplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isLikelyCdnHost(hostname: string): boolean {
@@ -24,9 +24,9 @@ function isLikelyCdnHost(hostname: string): boolean {
 }
 
 /**
- * Gets Direct Recommendation Href so this file stays easier to maintain for the next developer.
+ * Gets Direct Recommendation Href.
  *
- * @param input - input provided by the caller to control this behavior.
+ * @param input - inputsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 export function getDirectRecommendationHref(input: LinkInput): string {
@@ -48,9 +48,9 @@ export function getDirectRecommendationHref(input: LinkInput): string {
 }
 
 /**
- * Normalizes Domain so this file stays easier to maintain for the next developer.
+ * Normalizes Domain.
  *
- * @param domain - domain provided by the caller to control this behavior.
+ * @param domain - domainsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function normalizeDomain(domain: string): string {
@@ -58,10 +58,10 @@ function normalizeDomain(domain: string): string {
 }
 
 /**
- * Gets Reliable Recommendation Href so this file stays easier to maintain for the next developer.
+ * Gets Reliable Recommendation Href.
  *
- * @param input - input provided by the caller to control this behavior.
- * @param query - query provided by the caller to control this behavior.
+ * @param input - inputsupplied by the caller.
+ * @param query - querysupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 export function getReliableRecommendationHref(input: LinkInput, query: string): string {

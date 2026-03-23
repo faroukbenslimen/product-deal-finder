@@ -16,9 +16,9 @@ interface ResultCardProps {
 }
 
 /**
- * To Compact Price Label so this file stays easier to maintain for the next developer.
+ * To Compact Price Label.
  *
- * @param price - price provided by the caller to control this behavior.
+ * @param price - pricesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toCompactPriceLabel(price: string): string {
@@ -32,10 +32,10 @@ function toCompactPriceLabel(price: string): string {
 }
 
 /**
- * Result Card so this file stays easier to maintain for the next developer.
+ * Result Card.
  *
- * @param { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } - { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } - { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, }supplied by the caller.
+ * @returnsVoid.
  */
 export default function ResultCard({
   rec,

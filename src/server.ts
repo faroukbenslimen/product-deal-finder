@@ -168,9 +168,9 @@ const modelResponseSchema = z.object({
 }).strict();
 
 /**
- * Gets Client Ip so this file stays easier to maintain for the next developer.
+ * Gets Client Ip.
  *
- * @param req - req provided by the caller to control this behavior.
+ * @param req - reqsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getClientIp(req: Request): string {
@@ -182,9 +182,9 @@ function getClientIp(req: Request): string {
 }
 
 /**
- * Checks whether Rate Limited so this file stays easier to maintain for the next developer.
+ * Checks whether Rate Limited.
  *
- * @param ip - ip provided by the caller to control this behavior.
+ * @param ip - ipsupplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isRateLimited(ip: string): boolean {
@@ -204,10 +204,10 @@ function isRateLimited(ip: string): boolean {
 }
 
 /**
- * Checks whether In Cooldown so this file stays easier to maintain for the next developer.
+ * Checks whether In Cooldown.
  *
- * @param ip - ip provided by the caller to control this behavior.
- * @param scope - scope provided by the caller to control this behavior.
+ * @param ip - ipsupplied by the caller.
+ * @param scope - scopesupplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: boolean; retryAfterMs: number } {
@@ -225,10 +225,10 @@ function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: bool
 }
 
 /**
- * Consume Daily Model Budget so this file stays easier to maintain for the next developer.
+ * Consume Daily Model Budget.
  *
- * @param units - units provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param units - unitssupplied by the caller.
+ * @returnsVoid.
  */
 function consumeDailyModelBudget(units = 1): boolean {
   const currentDay = new Date().toISOString().slice(0, 10);
@@ -246,9 +246,9 @@ function consumeDailyModelBudget(units = 1): boolean {
 }
 
 /**
- * Builds Repair Prompt so this file stays easier to maintain for the next developer.
+ * Builds Repair Prompt.
  *
- * @param invalidText - invalidText provided by the caller to control this behavior.
+ * @param invalidText - invalidTextsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function buildRepairPrompt(invalidText: string): string {
@@ -287,9 +287,9 @@ ${invalidText}`;
 }
 
 /**
- * Extracts First Json Object so this file stays easier to maintain for the next developer.
+ * Extracts First Json Object.
  *
- * @param text - text provided by the caller to control this behavior.
+ * @param text - textsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function extractFirstJsonObject(text: string): string | null {
@@ -333,10 +333,10 @@ function extractFirstJsonObject(text: string): string | null {
 }
 
 /**
- * To Safe String so this file stays easier to maintain for the next developer.
+ * To Safe String.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param fallback - fallback provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param fallback - fallbacksupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeString(value: unknown, fallback = ''): string {
@@ -346,10 +346,10 @@ function toSafeString(value: unknown, fallback = ''): string {
 }
 
 /**
- * To Safe Number so this file stays easier to maintain for the next developer.
+ * To Safe Number.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param fallback - fallback provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param fallback - fallbacksupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeNumber(value: unknown, fallback = 0): number {
@@ -362,10 +362,10 @@ function toSafeNumber(value: unknown, fallback = 0): number {
 }
 
 /**
- * To Safe Currency so this file stays easier to maintain for the next developer.
+ * To Safe Currency.
  *
- * @param value - value provided by the caller to control this behavior.
- * @param fallback - fallback provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
+ * @param fallback - fallbacksupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeCurrency(value: unknown, fallback = 'USD'): string {
@@ -377,9 +377,9 @@ function toSafeCurrency(value: unknown, fallback = 'USD'): string {
 }
 
 /**
- * To Safe String Array so this file stays easier to maintain for the next developer.
+ * To Safe String Array.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeStringArray(value: unknown): string[] {
@@ -388,9 +388,9 @@ function toSafeStringArray(value: unknown): string[] {
 }
 
 /**
- * To Safe Specifications so this file stays easier to maintain for the next developer.
+ * To Safe Specifications.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function toSafeSpecifications(value: unknown): Array<{ feature: string; value: string }> {
@@ -409,10 +409,10 @@ function toSafeSpecifications(value: unknown): Array<{ feature: string; value: s
 }
 
 /**
- * Coerce Model Payload so this file stays easier to maintain for the next developer.
+ * Coerce Model Payload.
  *
- * @param value - value provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param value - valuesupplied by the caller.
+ * @returnsVoid.
  */
 function coerceModelPayload(value: unknown): unknown {
   const rootCandidate = value && typeof value === 'object' ? value as Record<string, unknown> : {};
@@ -453,9 +453,9 @@ function coerceModelPayload(value: unknown): unknown {
 }
 
 /**
- * Parses And Validate Model Response so this file stays easier to maintain for the next developer.
+ * Parses And Validate Model Response.
  *
- * @param rawText - rawText provided by the caller to control this behavior.
+ * @param rawText - rawTextsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function parseAndValidateModelResponse(rawText: string) {
@@ -482,10 +482,10 @@ function parseAndValidateModelResponse(rawText: string) {
 }
 
 /**
- * Builds Fallback Search Url so this file stays easier to maintain for the next developer.
+ * Builds Fallback Search Url.
  *
- * @param rec - rec provided by the caller to control this behavior.
- * @param query - query provided by the caller to control this behavior.
+ * @param rec - recsupplied by the caller.
+ * @param query - querysupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
@@ -496,9 +496,9 @@ function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
 }
 
 /**
- * Tokenize so this file stays easier to maintain for the next developer.
+ * Tokenize.
  *
- * @param text - text provided by the caller to control this behavior.
+ * @param text - textsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function tokenize(text: string): string[] {
@@ -510,9 +510,9 @@ function tokenize(text: string): string[] {
 }
 
 /**
- * Normalizes Host so this file stays easier to maintain for the next developer.
+ * Normalizes Host.
  *
- * @param value - value provided by the caller to control this behavior.
+ * @param value - valuesupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function normalizeHost(value: string): string {
@@ -520,11 +520,11 @@ function normalizeHost(value: string): string {
 }
 
 /**
- * Host Matches Domain so this file stays easier to maintain for the next developer.
+ * Host Matches Domain.
  *
- * @param host - host provided by the caller to control this behavior.
- * @param domain - domain provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param host - hostsupplied by the caller.
+ * @param domain - domainsupplied by the caller.
+ * @returnsVoid.
  */
 function hostMatchesDomain(host: string, domain: string): boolean {
   const safeHost = normalizeHost(host);
@@ -534,9 +534,9 @@ function hostMatchesDomain(host: string, domain: string): boolean {
 }
 
 /**
- * Checks whether Likely Cdn Host so this file stays easier to maintain for the next developer.
+ * Checks whether Likely Cdn Host.
  *
- * @param host - host provided by the caller to control this behavior.
+ * @param host - hostsupplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isLikelyCdnHost(host: string): boolean {
@@ -550,11 +550,11 @@ function isLikelyCdnHost(host: string): boolean {
 }
 
 /**
- * Evaluate Url Quality so this file stays easier to maintain for the next developer.
+ * Evaluate Url Quality.
  *
- * @param rec - rec provided by the caller to control this behavior.
- * @param query - query provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param rec - recsupplied by the caller.
+ * @param query - querysupplied by the caller.
+ * @returnsVoid.
  */
 function evaluateUrlQuality(rec: Recommendation, query: string): { score: number; useDirect: boolean } {
   if (!rec.url) {
@@ -610,11 +610,11 @@ function evaluateUrlQuality(rec: Recommendation, query: string): { score: number
 }
 
 /**
- * Sets Link Health so this file stays easier to maintain for the next developer.
+ * Sets Link Health.
  *
- * @param hostname - hostname provided by the caller to control this behavior.
- * @param success - success provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param hostname - hostnamesupplied by the caller.
+ * @param success - successsupplied by the caller.
+ * @returnsVoid.
  */
 function setLinkHealth(hostname: string, success: boolean): void {
   if (!hostname) return;
@@ -625,10 +625,10 @@ function setLinkHealth(hostname: string, success: boolean): void {
 }
 
 /**
- * Level From Score so this file stays easier to maintain for the next developer.
+ * Level From Score.
  *
- * @param score - score provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param score - scoresupplied by the caller.
+ * @returnsVoid.
  */
 function levelFromScore(score: number): 'low' | 'medium' | 'high' {
   if (score >= 75) return 'high';
@@ -637,11 +637,11 @@ function levelFromScore(score: number): 'low' | 'medium' | 'high' {
 }
 
 /**
- * Apply Link Fixes And Ranking so this file stays easier to maintain for the next developer.
+ * Apply Link Fixes And Ranking.
  *
- * @param recs - recs provided by the caller to control this behavior.
- * @param query - query provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param recs - recssupplied by the caller.
+ * @param query - querysupplied by the caller.
+ * @returnsVoid.
  */
 function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recommendation[] {
   return recs.map((rec) => {
@@ -675,10 +675,10 @@ function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recomm
 }
 
 /**
- * Fetches Model Content so this file stays easier to maintain for the next developer.
+ * Fetches Model Content.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 async function fetchModelContent(query: string, region: string): Promise<string> {
@@ -698,9 +698,9 @@ async function fetchModelContent(query: string, region: string): Promise<string>
 }
 
 /**
- * Should Try Fallback Provider so this file stays easier to maintain for the next developer.
+ * Should Try Fallback Provider.
  *
- * @param error - error provided by the caller to control this behavior.
+ * @param error - errorsupplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function shouldTryFallbackProvider(error: unknown): boolean {
@@ -720,9 +720,9 @@ function shouldTryFallbackProvider(error: unknown): boolean {
 }
 
 /**
- * Fetches Model Content From Open Router so this file stays easier to maintain for the next developer.
+ * Fetches Model Content From Open Router.
  *
- * @param prompt - prompt provided by the caller to control this behavior.
+ * @param prompt - promptsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> {
@@ -765,10 +765,10 @@ async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> 
 }
 
 /**
- * Fetches Model Content With Fallback so this file stays easier to maintain for the next developer.
+ * Fetches Model Content With Fallback.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 async function fetchModelContentWithFallback(query: string, region: string): Promise<{ text: string; provider: 'gemini' | 'openrouter' }> {
@@ -785,10 +785,10 @@ async function fetchModelContentWithFallback(query: string, region: string): Pro
 }
 
 /**
- * Repair Model Content so this file stays easier to maintain for the next developer.
+ * Repair Model Content.
  *
- * @param invalidText - invalidText provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param invalidText - invalidTextsupplied by the caller.
+ * @returnsVoid.
  */
 async function repairModelContent(invalidText: string): Promise<string> {
   try {
@@ -811,10 +811,10 @@ async function repairModelContent(invalidText: string): Promise<string> {
 }
 
 /**
- * Gets Cache Key so this file stays easier to maintain for the next developer.
+ * Gets Cache Key.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getCacheKey(query: string, region: string): string {
@@ -833,10 +833,10 @@ function getCacheKey(query: string, region: string): string {
 }
 
 /**
- * Gets Cached Result so this file stays easier to maintain for the next developer.
+ * Gets Cached Result.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getCachedResult(query: string, region: string): CacheEntry | null {
@@ -854,12 +854,12 @@ function getCachedResult(query: string, region: string): CacheEntry | null {
 }
 
 /**
- * Sets Cached Result so this file stays easier to maintain for the next developer.
+ * Sets Cached Result.
  *
- * @param query - query provided by the caller to control this behavior.
- * @param region - region provided by the caller to control this behavior.
- * @param result - result provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param query - querysupplied by the caller.
+ * @param region - regionsupplied by the caller.
+ * @param result - resultsupplied by the caller.
+ * @returnsVoid.
  */
 function setCachedResult(query: string, region: string, result: CacheEntry['result']): void {
   const key = getCacheKey(query, region);

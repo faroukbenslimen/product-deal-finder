@@ -19,9 +19,9 @@ import { useProductSearch } from './hooks/useProductSearch';
 const PLACEHOLDER_IMAGE = 'https://placehold.co/640x420/e5e7eb/6b7280?text=No+Image';
 
 /**
- * Gets Recommendation Key so this file stays easier to maintain for the next developer.
+ * Gets Recommendation Key.
  *
- * @param rec - rec provided by the caller to control this behavior.
+ * @param rec - recsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getRecommendationKey(rec: SearchResult['recommendations'][number]): string {
@@ -30,9 +30,9 @@ function getRecommendationKey(rec: SearchResult['recommendations'][number]): str
 }
 
 /**
- * Gets Deal Confidence so this file stays easier to maintain for the next developer.
+ * Gets Deal Confidence.
  *
- * @param rec - rec provided by the caller to control this behavior.
+ * @param rec - recsupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getDealConfidence(rec: SearchResult['recommendations'][number]): number {
@@ -48,9 +48,9 @@ function getDealConfidence(rec: SearchResult['recommendations'][number]): number
 }
 
 /**
- * Gets Confidence Tone so this file stays easier to maintain for the next developer.
+ * Gets Confidence Tone.
  *
- * @param score - score provided by the caller to control this behavior.
+ * @param score - scoresupplied by the caller.
  * @returns The computed value this helper produces for downstream logic.
  */
 function getConfidenceTone(score: number): string {
@@ -62,7 +62,7 @@ function getConfidenceTone(score: number): string {
 /**
  * App so this code stays predictable and easier to maintain.
  *
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @returnsVoid.
  */
 export default function App() {
   const {
@@ -109,10 +109,10 @@ export default function App() {
   }, [isLoading]);
 
   /**
-   * Handles Sort so this file stays easier to maintain for the next developer.
+   * Handles Sort.
    *
-   * @param key - key provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param key - keysupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -126,10 +126,10 @@ export default function App() {
 
 
   /**
-   * Handles Drag Drop so this file stays easier to maintain for the next developer.
+   * Handles Drag Drop.
    *
-   * @param e - e provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param e - esupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -144,10 +144,10 @@ export default function App() {
   };
 
   /**
-   * Handles Drag Over so this file stays easier to maintain for the next developer.
+   * Handles Drag Over.
    *
-   * @param e - e provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param e - esupplied by the caller.
+   * @returnsVoid.
    */
 
 
@@ -197,9 +197,9 @@ export default function App() {
   const containerMaxWidth = isTableView ? 'max-w-[98vw] xl:max-w-[95vw] 2xl:max-w-[1800px]' : 'max-w-5xl';
 
   /**
-   * Gets Recommendation Href so this file stays easier to maintain for the next developer.
+   * Gets Recommendation Href.
    *
-   * @param rec - rec provided by the caller to control this behavior.
+   * @param rec - recsupplied by the caller.
    * @returns The computed value this helper produces for downstream logic.
    */
 
@@ -207,9 +207,9 @@ export default function App() {
   const getRecommendationHref = (rec: SearchResult['recommendations'][number]) => getReliableRecommendationHref(rec, query);
 
   /**
-   * Toggles Watchlist so this file stays easier to maintain for the next developer.
+   * Toggles Watchlist.
    *
-   * @param rec - rec provided by the caller to control this behavior.
+   * @param rec - recsupplied by the caller.
    * @returns The computed value this helper produces for downstream logic.
    */
 

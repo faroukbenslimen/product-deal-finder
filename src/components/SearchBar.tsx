@@ -14,10 +14,10 @@ interface SearchBarProps {
 }
 
 /**
- * Search Bar so this file stays easier to maintain for the next developer.
+ * Search Bar.
  *
- * @param { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } - { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } provided by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @param { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } - { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, }supplied by the caller.
+ * @returnsVoid.
  */
 export default function SearchBar({
   query,

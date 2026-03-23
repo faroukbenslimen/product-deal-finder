@@ -52,7 +52,7 @@ export function isTemporaryOverloadError(error: any): boolean {
  * Classify Error so this code stays predictable and easier to maintain.
  *
  * @param error - error passed by the caller to control this behavior.
- * @returns Nothing meaningful; this function exists for side effects and flow control.
+ * @returnsVoid.
  */
 export function classifyError(error: any): ErrorInfo {
   const isQuota = isQuotaError(error);

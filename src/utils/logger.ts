@@ -21,7 +21,7 @@ class Logger {
    * @param message - message passed by the caller to control this behavior.
    * @param context - context passed by the caller to control this behavior.
    * @param error - error passed by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @returnsVoid.
    */
 private formatEntry(level: string, message: string, context?: Record<string, unknown>, error?: Error): LogEntry {
     return {
@@ -34,11 +34,11 @@ private formatEntry(level: string, message: string, context?: Record<string, unk
   }
 
     /**
-   * Info so this file stays easier to maintain for the next developer.
+   * Info.
    *
-   * @param message - message provided by the caller to control this behavior.
-   * @param context - context provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param message - messagesupplied by the caller.
+   * @param context - contextsupplied by the caller.
+   * @returnsVoid.
    */
 info(message: string, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('info', message, context);
@@ -46,11 +46,11 @@ info(message: string, context?: Record<string, unknown>): void {
   }
 
     /**
-   * Warn so this file stays easier to maintain for the next developer.
+   * Warn.
    *
-   * @param message - message provided by the caller to control this behavior.
-   * @param context - context provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param message - messagesupplied by the caller.
+   * @param context - contextsupplied by the caller.
+   * @returnsVoid.
    */
 warn(message: string, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('warn', message, context);
@@ -58,12 +58,12 @@ warn(message: string, context?: Record<string, unknown>): void {
   }
 
     /**
-   * Error so this file stays easier to maintain for the next developer.
+   * Error.
    *
-   * @param message - message provided by the caller to control this behavior.
-   * @param error - error provided by the caller to control this behavior.
-   * @param context - context provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param message - messagesupplied by the caller.
+   * @param error - errorsupplied by the caller.
+   * @param context - contextsupplied by the caller.
+   * @returnsVoid.
    */
 error(message: string, error?: Error, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('error', message, context, error);
@@ -71,11 +71,11 @@ error(message: string, error?: Error, context?: Record<string, unknown>): void {
   }
 
     /**
-   * Debug so this file stays easier to maintain for the next developer.
+   * Debug.
    *
-   * @param message - message provided by the caller to control this behavior.
-   * @param context - context provided by the caller to control this behavior.
-   * @returns Nothing meaningful; this function exists for side effects and flow control.
+   * @param message - messagesupplied by the caller.
+   * @param context - contextsupplied by the caller.
+   * @returnsVoid.
    */
 debug(message: string, context?: Record<string, unknown>): void {
     if (this.isDev) {
