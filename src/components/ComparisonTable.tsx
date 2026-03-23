@@ -21,8 +21,8 @@ interface ComparisonTableProps {
 /**
  * Comparison Table.
  *
- * @param { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } - { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, }supplied by the caller.
- * @returnsVoid.
+ * @param { sortedRecommendations, allSpecKeys, sortConfig, onSort, getConfidence, getConfidenceTone, getRecommendationHref, getDirectHref, } - Props supplied by the parent component.
+ * @returns void
  */
 export default function ComparisonTable({
   sortedRecommendations,
@@ -34,12 +34,12 @@ export default function ComparisonTable({
   getRecommendationHref,
   getDirectHref,
 }: ComparisonTableProps) {
-  /**
-   * Sort Icon.
-   *
-   * @param columnKey - columnKeysupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Sort Icon.
+ *
+ * @param columnKey - Value supplied by the caller.
+ * @returns void
+ */
 
   const sortIcon = (columnKey: string) => {
     if (sortConfig?.key !== columnKey) {

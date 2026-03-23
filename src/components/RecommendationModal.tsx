@@ -15,8 +15,8 @@ interface RecommendationModalProps {
 /**
  * Recommendation Modal.
  *
- * @param { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } - { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, }supplied by the caller.
- * @returnsVoid.
+ * @param { recommendation, placeholderImage, getRecommendationHref, getDirectHref, onClose, } - Props supplied by the parent component.
+ * @returns void
  */
 export default function RecommendationModal({
   recommendation,

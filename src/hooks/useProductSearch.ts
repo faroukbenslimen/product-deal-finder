@@ -4,34 +4,48 @@ import { analytics } from '../analytics';
 import { normalizeSearchResult, type SearchResult } from '../shared/searchSchema';
 
 /**
- * Use Product Search so this code stays predictable and easier to maintain.
+ * Use Product Search to keep behavior centralized and easier to reason about.
  *
- * @returnsVoid.
+ * @returns void
  */
 export function useProductSearch() {
+ /** Keeps the current user query text as the source of truth for searches. */
   const [query, setQuery] = useState('');
+ /** Stores the active region so API requests and result filtering stay aligned. */
   const [region, setRegion] = useState('Global');
+ /** Signals active search execution to disable inputs and show loading UI. */
   const [isLoading, setIsLoading] = useState(false);
+ /** Tracks the current progress phase displayed in the stepper component. */
   const [activeStep, setActiveStep] = useState(0);
+ /** Holds the latest normalized search payload rendered by the page. */
   const [result, setResult] = useState<SearchResult | null>(null);
+ /** Stores the current user-facing error message for request failures. */
   const [error, setError] = useState<string | null>(null);
+ /** Stores validation feedback when the query is too short or unclear. */
   const [queryValidationError, setQueryValidationError] = useState<string | null>(null);
 
+ /** Indicates whether image-based product identification is currently running. */
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
+ /** Keeps a preview data URL so users can verify the uploaded image. */
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+ /** Applies an optional maximum-price constraint to displayed recommendations. */
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
+ /** Stores the chosen merchant filter for narrowing recommendation lists. */
   const [selectedStore, setSelectedStore] = useState<string>('All');
+ /** Stores the minimum rating threshold used by client-side filtering. */
   const [minRating, setMinRating] = useState<number>(0);
 
+ /** Keeps timeout handles so staged loading progress can be cancelled reliably. */
   const loadingTimeoutsRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+ /** Keeps the active request controller so a new search can abort stale requests. */
   const searchAbortControllerRef = useRef<AbortController | null>(null);
 
-  /**
-   * Clears Loading Timers.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Clears Loading Timers.
+ *
+ * @returns void
+ */
 
 
   const clearLoadingTimers = () => {
@@ -39,11 +53,11 @@ export function useProductSearch() {
     loadingTimeoutsRef.current = [];
   };
 
-  /**
-   * Starts Loading Progress.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Starts Loading Progress.
+ *
+ * @returns void
+ */
 
 
   const startLoadingProgress = () => {
@@ -63,12 +77,12 @@ export function useProductSearch() {
     };
   }, []);
 
-  /**
-   * Maps Search Error Message.
-   *
-   * @param err - errsupplied by the caller.
-   * @returns The computed value this helper produces for downstream logic.
-   */
+ /**
+ * Maps Search Error Message.
+ *
+ * @param err - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
+ */
 
 
   const mapSearchErrorMessage = (err: unknown): string => {
@@ -92,14 +106,14 @@ export function useProductSearch() {
     return 'Something went wrong. Try a more specific product name.';
   };
 
-  /**
-   * Perform Search.
-   *
-   * @param queryToSearch - queryToSearchsupplied by the caller.
-   * @param regionToSearch - regionToSearchsupplied by the caller.
-   * @param source - sourcesupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Perform Search.
+ *
+ * @param queryToSearch - Value supplied by the caller.
+ * @param regionToSearch - Value supplied by the caller.
+ * @param source - Value supplied by the caller.
+ * @returns void
+ */
 
 
   const performSearch = async (queryToSearch: string, regionToSearch: string, source: 'search' | 'image_search') => {
@@ -178,12 +192,12 @@ export function useProductSearch() {
     }
   };
 
-  /**
-   * Handles Search.
-   *
-   * @param e - esupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Handles Search.
+ *
+ * @param e - Value supplied by the caller.
+ * @returns void
+ */
 
 
   const handleSearch = async (e: FormEvent) => {
@@ -198,12 +212,12 @@ export function useProductSearch() {
     await performSearch(trimmedQuery, region, 'search');
   };
 
-  /**
-   * Handles Image Upload.
-   *
-   * @param file - filesupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Handles Image Upload.
+ *
+ * @param file - Value supplied by the caller.
+ * @returns void
+ */
 
 
   const handleImageUpload = async (file: File) => {
@@ -270,6 +284,7 @@ export function useProductSearch() {
     }
   };
 
+ /** Derives the visible recommendation list from current filter controls. */
   const filteredRecommendations = useMemo(() => {
     if (!result) {
       return [];
@@ -283,18 +298,20 @@ export function useProductSearch() {
     });
   }, [result, maxPrice, selectedStore, minRating]);
 
+ /** Derives unique store names for the store filter options. */
   const uniqueStores = useMemo(
     () => (result ? Array.from(new Set(result.recommendations.map((rec) => rec.storeName))) : []),
     [result]
   );
 
+ /** Exposes detected currency with a safe default for filter and price labels. */
   const detectedCurrency = result?.detectedCurrency || 'USD';
 
-  /**
-   * Clears Filters.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Clears Filters.
+ *
+ * @returns void
+ */
 
 
   const clearFilters = () => {
@@ -303,11 +320,11 @@ export function useProductSearch() {
     setMinRating(0);
   };
 
-  /**
-   * Starts New Search.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Starts New Search.
+ *
+ * @returns void
+ */
 
 
   const startNewSearch = () => {

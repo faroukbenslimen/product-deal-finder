@@ -14,15 +14,15 @@ export interface LogEntry {
 class Logger {
   private isDev = process.env.NODE_ENV === 'development';
 
-    /**
-   * Format Entry so this code stays predictable and easier to maintain.
-   *
-   * @param level - level passed by the caller to control this behavior.
-   * @param message - message passed by the caller to control this behavior.
-   * @param context - context passed by the caller to control this behavior.
-   * @param error - error passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Format Entry to keep behavior centralized and easier to reason about.
+ *
+ * @param level - level passed by the caller to control this behavior.
+ * @param message - message passed by the caller to control this behavior.
+ * @param context - context passed by the caller to control this behavior.
+ * @param error - error passed by the caller to control this behavior.
+ * @returns void
+ */
 private formatEntry(level: string, message: string, context?: Record<string, unknown>, error?: Error): LogEntry {
     return {
       timestamp: new Date().toISOString(),
@@ -33,50 +33,50 @@ private formatEntry(level: string, message: string, context?: Record<string, unk
     };
   }
 
-    /**
-   * Info.
-   *
-   * @param message - messagesupplied by the caller.
-   * @param context - contextsupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Info.
+ *
+ * @param message - Value supplied by the caller.
+ * @param context - Value supplied by the caller.
+ * @returns void
+ */
 info(message: string, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('info', message, context);
     console.log(JSON.stringify(entry));
   }
 
-    /**
-   * Warn.
-   *
-   * @param message - messagesupplied by the caller.
-   * @param context - contextsupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Warn.
+ *
+ * @param message - Value supplied by the caller.
+ * @param context - Value supplied by the caller.
+ * @returns void
+ */
 warn(message: string, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('warn', message, context);
     console.warn(JSON.stringify(entry));
   }
 
-    /**
-   * Error.
-   *
-   * @param message - messagesupplied by the caller.
-   * @param error - errorsupplied by the caller.
-   * @param context - contextsupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Error.
+ *
+ * @param message - Value supplied by the caller.
+ * @param error - Value supplied by the caller.
+ * @param context - Value supplied by the caller.
+ * @returns void
+ */
 error(message: string, error?: Error, context?: Record<string, unknown>): void {
     const entry = this.formatEntry('error', message, context, error);
     console.error(JSON.stringify(entry));
   }
 
-    /**
-   * Debug.
-   *
-   * @param message - messagesupplied by the caller.
-   * @param context - contextsupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Debug.
+ *
+ * @param message - Value supplied by the caller.
+ * @param context - Value supplied by the caller.
+ * @returns void
+ */
 debug(message: string, context?: Record<string, unknown>): void {
     if (this.isDev) {
       const entry = this.formatEntry('debug', message, context);

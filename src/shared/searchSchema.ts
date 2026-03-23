@@ -44,9 +44,9 @@ const MAX_TEXT_LENGTH = 500;
 /**
  * To Safe String.
  *
- * @param value - valuesupplied by the caller.
- * @param fallback - fallbacksupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param fallback - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeString(value: unknown, fallback = ''): string {
   if (typeof value !== 'string') {
@@ -58,9 +58,9 @@ function toSafeString(value: unknown, fallback = ''): string {
 /**
  * To Safe Number.
  *
- * @param value - valuesupplied by the caller.
- * @param fallback - fallbacksupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param fallback - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -78,8 +78,8 @@ function toSafeNumber(value: unknown, fallback = 0): number {
 /**
  * To String Array.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
@@ -94,8 +94,8 @@ function toStringArray(value: unknown): string[] {
 /**
  * Sanitize Url.
  *
- * @param value - valuesupplied by the caller.
- * @returnsVoid.
+ * @param value - Value supplied by the caller.
+ * @returns void
  */
 function sanitizeUrl(value: unknown): string {
   const raw = toSafeString(value);
@@ -119,8 +119,8 @@ function sanitizeUrl(value: unknown): string {
 /**
  * Sanitize Domain.
  *
- * @param value - valuesupplied by the caller.
- * @returnsVoid.
+ * @param value - Value supplied by the caller.
+ * @returns void
  */
 function sanitizeDomain(value: unknown): string {
   const domain = toSafeString(value).replace(/^https?:\/\//, '').replace(/\/.*$/, '');
@@ -130,8 +130,8 @@ function sanitizeDomain(value: unknown): string {
 /**
  * Normalizes Specifications.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function normalizeSpecifications(value: unknown): Specification[] {
   if (!Array.isArray(value)) {
@@ -157,8 +157,8 @@ function normalizeSpecifications(value: unknown): Specification[] {
 /**
  * Normalizes Recommendation.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function normalizeRecommendation(value: unknown): Recommendation {
   const rec = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
@@ -230,9 +230,9 @@ function normalizeRecommendation(value: unknown): Recommendation {
 /**
  * Normalizes Search Result.
  *
- * @param value - valuesupplied by the caller.
- * @param options - optionssupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param options - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 export function normalizeSearchResult(value: unknown, options: NormalizeOptions = {}): SearchResult {
   const root = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;

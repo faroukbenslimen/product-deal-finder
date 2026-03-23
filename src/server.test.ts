@@ -7,12 +7,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 /**
- * Fetch Api so this code stays predictable and easier to maintain.
+ * Fetch Api to keep behavior centralized and easier to reason about.
  *
  * @param method - method passed by the caller to control this behavior.
  * @param path - path passed by the caller to control this behavior.
  * @param body - body passed by the caller to control this behavior.
- * @returns The computed value this function returns for downstream logic.
+ * @returns Computed value used by downstream logic.
  */
 async function fetchApi(method: string, path: string, body?: any) {
   const baseUrl = process.env.API_URL || 'http://localhost:4000';

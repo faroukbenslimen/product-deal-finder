@@ -1,8 +1,8 @@
 ﻿// File role: Loading placeholder card shown while recommendations are being fetched.
 /**
- * Skeleton Card so this code stays predictable and easier to maintain.
+ * Skeleton Card to keep behavior centralized and easier to reason about.
  *
- * @returnsVoid.
+ * @returns void
  */
 export default function SkeletonCard() {
   return (

@@ -10,7 +10,7 @@ export interface LinkInput {
 /**
  * Checks whether Likely Cdn Host.
  *
- * @param hostname - hostnamesupplied by the caller.
+ * @param hostname - Value supplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isLikelyCdnHost(hostname: string): boolean {
@@ -26,8 +26,8 @@ function isLikelyCdnHost(hostname: string): boolean {
 /**
  * Gets Direct Recommendation Href.
  *
- * @param input - inputsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param input - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 export function getDirectRecommendationHref(input: LinkInput): string {
   const candidateUrl = (input.url || '').trim();
@@ -50,8 +50,8 @@ export function getDirectRecommendationHref(input: LinkInput): string {
 /**
  * Normalizes Domain.
  *
- * @param domain - domainsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param domain - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function normalizeDomain(domain: string): string {
   return domain.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -60,9 +60,9 @@ function normalizeDomain(domain: string): string {
 /**
  * Gets Reliable Recommendation Href.
  *
- * @param input - inputsupplied by the caller.
- * @param query - querysupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param input - Value supplied by the caller.
+ * @param query - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 export function getReliableRecommendationHref(input: LinkInput, query: string): string {
   if (input.fallbackUrl && input.fallbackUrl.startsWith('https://www.google.com/search?q=')) {

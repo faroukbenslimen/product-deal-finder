@@ -21,8 +21,8 @@ const PLACEHOLDER_IMAGE = 'https://placehold.co/640x420/e5e7eb/6b7280?text=No+Im
 /**
  * Gets Recommendation Key.
  *
- * @param rec - recsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param rec - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getRecommendationKey(rec: SearchResult['recommendations'][number]): string {
   const urlPart = rec.url?.trim() || rec.domain?.trim() || 'unknown';
@@ -32,8 +32,8 @@ function getRecommendationKey(rec: SearchResult['recommendations'][number]): str
 /**
  * Gets Deal Confidence.
  *
- * @param rec - recsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param rec - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getDealConfidence(rec: SearchResult['recommendations'][number]): number {
   if (rec.confidenceScore > 0) {
@@ -50,8 +50,8 @@ function getDealConfidence(rec: SearchResult['recommendations'][number]): number
 /**
  * Gets Confidence Tone.
  *
- * @param score - scoresupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param score - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getConfidenceTone(score: number): string {
   if (score >= 80) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
@@ -60,9 +60,9 @@ function getConfidenceTone(score: number): string {
 }
 
 /**
- * App so this code stays predictable and easier to maintain.
+ * App to keep behavior centralized and easier to reason about.
  *
- * @returnsVoid.
+ * @returns void
  */
 export default function App() {
   const {
@@ -108,12 +108,12 @@ export default function App() {
     }
   }, [isLoading]);
 
-  /**
-   * Handles Sort.
-   *
-   * @param key - keysupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Handles Sort.
+ *
+ * @param key - Value supplied by the caller.
+ * @returns void
+ */
 
 
   const handleSort = (key: string) => {
@@ -125,12 +125,12 @@ export default function App() {
   };
 
 
-  /**
-   * Handles Drag Drop.
-   *
-   * @param e - esupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Handles Drag Drop.
+ *
+ * @param e - Value supplied by the caller.
+ * @returns void
+ */
 
 
 
@@ -143,12 +143,12 @@ export default function App() {
     }
   };
 
-  /**
-   * Handles Drag Over.
-   *
-   * @param e - esupplied by the caller.
-   * @returnsVoid.
-   */
+ /**
+ * Handles Drag Over.
+ *
+ * @param e - Value supplied by the caller.
+ * @returns void
+ */
 
 
   const handleDragOver = (e: ReactDragEvent<HTMLDivElement>) => {
@@ -196,22 +196,22 @@ export default function App() {
   const isTableView = viewMode === 'table' && result && filteredRecommendations.length > 0;
   const containerMaxWidth = isTableView ? 'max-w-[98vw] xl:max-w-[95vw] 2xl:max-w-[1800px]' : 'max-w-5xl';
 
-  /**
-   * Gets Recommendation Href.
-   *
-   * @param rec - recsupplied by the caller.
-   * @returns The computed value this helper produces for downstream logic.
-   */
+ /**
+ * Gets Recommendation Href.
+ *
+ * @param rec - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
+ */
 
 
   const getRecommendationHref = (rec: SearchResult['recommendations'][number]) => getReliableRecommendationHref(rec, query);
 
-  /**
-   * Toggles Watchlist.
-   *
-   * @param rec - recsupplied by the caller.
-   * @returns The computed value this helper produces for downstream logic.
-   */
+ /**
+ * Toggles Watchlist.
+ *
+ * @param rec - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
+ */
 
 
   const toggleWatchlist = (rec: SearchResult['recommendations'][number]) => {

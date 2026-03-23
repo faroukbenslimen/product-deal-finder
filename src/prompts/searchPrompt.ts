@@ -2,9 +2,9 @@
 /**
  * Builds Search Prompt.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 export function buildSearchPrompt(query: string, region: string): string {
   const regionContext =

@@ -18,8 +18,8 @@ interface ResultCardProps {
 /**
  * To Compact Price Label.
  *
- * @param price - pricesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param price - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toCompactPriceLabel(price: string): string {
   const normalized = price.replace(/\s+/g, ' ').trim();
@@ -34,8 +34,8 @@ function toCompactPriceLabel(price: string): string {
 /**
  * Result Card.
  *
- * @param { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } - { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, }supplied by the caller.
- * @returnsVoid.
+ * @param { rec, placeholderImage, confidence, confidenceTone, recommendationHref, directHref, isWatched, onOpenDetails, onToggleWatchlist, onDealClick, } - Props supplied by the parent component.
+ * @returns void
  */
 export default function ResultCard({
   rec,

@@ -18,8 +18,8 @@ const STEPS = [
 /**
  * Progress Stepper.
  *
- * @param { activeStep } - { activeStep }supplied by the caller.
- * @returnsVoid.
+ * @param { activeStep } - Props supplied by the parent component.
+ * @returns void
  */
 export default function ProgressStepper({ activeStep }: ProgressStepperProps) {
   return (

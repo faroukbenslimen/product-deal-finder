@@ -7,7 +7,7 @@ export interface ErrorInfo {
 }
 
 /**
- * Is Quota Error so this code stays predictable and easier to maintain.
+ * Is Quota Error to keep behavior centralized and easier to reason about.
  *
  * @param error - error passed by the caller to control this behavior.
  * @returns True when the condition is met so callers can branch safely.
@@ -27,7 +27,7 @@ export function isQuotaError(error: any): boolean {
 }
 
 /**
- * Is Temporary Overload Error so this code stays predictable and easier to maintain.
+ * Is Temporary Overload Error to keep behavior centralized and easier to reason about.
  *
  * @param error - error passed by the caller to control this behavior.
  * @returns True when the condition is met so callers can branch safely.
@@ -49,10 +49,10 @@ export function isTemporaryOverloadError(error: any): boolean {
 }
 
 /**
- * Classify Error so this code stays predictable and easier to maintain.
+ * Classify Error to keep behavior centralized and easier to reason about.
  *
  * @param error - error passed by the caller to control this behavior.
- * @returnsVoid.
+ * @returns void
  */
 export function classifyError(error: any): ErrorInfo {
   const isQuota = isQuotaError(error);
@@ -71,10 +71,10 @@ export function classifyError(error: any): ErrorInfo {
 }
 
 /**
- * Get User Friendly Error Message so this code stays predictable and easier to maintain.
+ * Get User Friendly Error Message to keep behavior centralized and easier to reason about.
  *
  * @param error - error passed by the caller to control this behavior.
- * @returns The computed value this function returns for downstream logic.
+ * @returns Computed value used by downstream logic.
  */
 export function getUserFriendlyErrorMessage(error: any): string {
   const isQuota = isQuotaError(error);

@@ -22,10 +22,10 @@ const MAX_METRICS = 1000;
 /**
  * Observability Middleware.
  *
- * @param req - reqsupplied by the caller.
- * @param res - ressupplied by the caller.
- * @param next - nextsupplied by the caller.
- * @returnsVoid.
+ * @param req - Value supplied by the caller.
+ * @param res - Value supplied by the caller.
+ * @param next - Value supplied by the caller.
+ * @returns void
  */
 export function observabilityMiddleware(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();
@@ -68,9 +68,9 @@ export function observabilityMiddleware(req: Request, res: Response, next: NextF
 }
 
 /**
- * Get Metrics so this code stays predictable and easier to maintain.
+ * Get Metrics to keep behavior centralized and easier to reason about.
  *
- * @returns The computed value this function returns for downstream logic.
+ * @returns Computed value used by downstream logic.
  */
 export function getMetrics() {
   const totalRequests = metricsStore.length;
@@ -90,9 +90,9 @@ export function getMetrics() {
 }
 
 /**
- * Get Search Metrics so this code stays predictable and easier to maintain.
+ * Get Search Metrics to keep behavior centralized and easier to reason about.
  *
- * @returns The computed value this function returns for downstream logic.
+ * @returns Computed value used by downstream logic.
  */
 export function getSearchMetrics() {
   const searchMetrics = metricsStore.filter((m) => m.path.includes('/api/search'));

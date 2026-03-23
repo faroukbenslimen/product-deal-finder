@@ -17,21 +17,21 @@ class Analytics {
   private eventQueue: AnalyticsEvent[] = [];
   private isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
 
-    /**
-   * Constructor so this code stays predictable and easier to maintain.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Constructor to keep behavior centralized and easier to reason about.
+ *
+ * @returns void
+ */
 constructor() {
     // Initialize with your analytics provider here
     // Example: Google Analytics, Vercel Analytics, Mixpanel, etc.
     this.initializeProvider();
   }
 
-    /**
- * Initialize Provider so this code stays predictable and easier to maintain.
+ /**
+ * Initialize Provider to keep behavior centralized and easier to reason about.
  *
- * @returnsVoid.
+ * @returns void
  */
 private initializeProvider(): void {
     // Vercel Analytics is enabled via <Analytics /> in main.tsx.
@@ -40,14 +40,14 @@ private initializeProvider(): void {
     }
   }
 
-    /**
-   * Track Search so this code stays predictable and easier to maintain.
-   *
-   * @param query - query passed by the caller to control this behavior.
-   * @param region - region passed by the caller to control this behavior.
-   * @param resultCount - resultCount passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Search to keep behavior centralized and easier to reason about.
+ *
+ * @param query - query passed by the caller to control this behavior.
+ * @param region - region passed by the caller to control this behavior.
+ * @param resultCount - resultCount passed by the caller to control this behavior.
+ * @returns void
+ */
   trackSearch(query: string, region: string, resultCount: number): void {
     this.trackEvent('search', {
       query: query.substring(0, 50), // Sanitize query
@@ -56,13 +56,13 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Image Upload so this code stays predictable and easier to maintain.
-   *
-   * @param size - size passed by the caller to control this behavior.
-   * @param success - success passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Image Upload to keep behavior centralized and easier to reason about.
+ *
+ * @param size - size passed by the caller to control this behavior.
+ * @param success - success passed by the caller to control this behavior.
+ * @returns void
+ */
   trackImageUpload(size: number, success: boolean): void {
     this.trackEvent('image_upload', {
       size: Math.round(size / 1024), // Convert to KB
@@ -70,13 +70,13 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Deal Click so this code stays predictable and easier to maintain.
-   *
-   * @param storeName - storeName passed by the caller to control this behavior.
-   * @param isBest - isBest passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Deal Click to keep behavior centralized and easier to reason about.
+ *
+ * @param storeName - storeName passed by the caller to control this behavior.
+ * @param isBest - isBest passed by the caller to control this behavior.
+ * @returns void
+ */
   trackDealClick(storeName: string, isBest: boolean): void {
     this.trackEvent('deal_click', {
       store: storeName.substring(0, 50),
@@ -84,13 +84,13 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Watchlist Action so this code stays predictable and easier to maintain.
-   *
-   * @param action - action passed by the caller to control this behavior.
-   * @param storeName - storeName passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Watchlist Action to keep behavior centralized and easier to reason about.
+ *
+ * @param action - action passed by the caller to control this behavior.
+ * @param storeName - storeName passed by the caller to control this behavior.
+ * @returns void
+ */
   trackWatchlistAction(action: 'add' | 'remove', storeName: string): void {
     this.trackEvent('watchlist_action', {
       action,
@@ -98,37 +98,37 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Filter Usage so this code stays predictable and easier to maintain.
-   *
-   * @param filterType - filterType passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Filter Usage to keep behavior centralized and easier to reason about.
+ *
+ * @param filterType - filterType passed by the caller to control this behavior.
+ * @returns void
+ */
   trackFilterUsage(filterType: 'price' | 'store' | 'rating'): void {
     this.trackEvent('filter_used', {
       filterType,
     });
   }
 
-    /**
-   * Track View Mode Switch so this code stays predictable and easier to maintain.
-   *
-   * @param mode - mode passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track View Mode Switch to keep behavior centralized and easier to reason about.
+ *
+ * @param mode - mode passed by the caller to control this behavior.
+ * @returns void
+ */
   trackViewModeSwitch(mode: 'cards' | 'table'): void {
     this.trackEvent('view_mode_switch', {
       mode,
     });
   }
 
-    /**
-   * Track Error so this code stays predictable and easier to maintain.
-   *
-   * @param errorMessage - errorMessage passed by the caller to control this behavior.
-   * @param context - context passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Error to keep behavior centralized and easier to reason about.
+ *
+ * @param errorMessage - errorMessage passed by the caller to control this behavior.
+ * @param context - context passed by the caller to control this behavior.
+ * @returns void
+ */
   trackError(errorMessage: string, context?: string): void {
     this.trackEvent('error_occurred', {
       error: errorMessage.substring(0, 100),
@@ -136,13 +136,13 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Timing so this code stays predictable and easier to maintain.
-   *
-   * @param operation - operation passed by the caller to control this behavior.
-   * @param duration - duration passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Timing to keep behavior centralized and easier to reason about.
+ *
+ * @param operation - operation passed by the caller to control this behavior.
+ * @param duration - duration passed by the caller to control this behavior.
+ * @returns void
+ */
   trackTiming(operation: string, duration: number): void {
     this.trackEvent('timing', {
       operation,
@@ -150,13 +150,13 @@ private initializeProvider(): void {
     });
   }
 
-    /**
-   * Track Event so this code stays predictable and easier to maintain.
-   *
-   * @param name - name passed by the caller to control this behavior.
-   * @param properties - properties passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Track Event to keep behavior centralized and easier to reason about.
+ *
+ * @param name - name passed by the caller to control this behavior.
+ * @param properties - properties passed by the caller to control this behavior.
+ * @returns void
+ */
   private trackEvent(name: string, properties?: Record<string, string | number | boolean>): void {
     if (!this.isEnabled) return;
 
@@ -180,22 +180,22 @@ private initializeProvider(): void {
     this.flushIfNeeded();
   }
 
-    /**
-   * Flush If Needed so this code stays predictable and easier to maintain.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Flush If Needed to keep behavior centralized and easier to reason about.
+ *
+ * @returns void
+ */
   private flushIfNeeded(): void {
     if (this.eventQueue.length >= 10) {
       this.flush();
     }
   }
 
-    /**
-   * Flush so this code stays predictable and easier to maintain.
-   *
-   * @returnsVoid.
-   */
+ /**
+ * Flush to keep behavior centralized and easier to reason about.
+ *
+ * @returns void
+ */
   flush(): void {
     if (this.eventQueue.length === 0) return;
 
@@ -215,12 +215,12 @@ private initializeProvider(): void {
     }
   }
 
-    /**
-   * Set User Properties so this code stays predictable and easier to maintain.
-   *
-   * @param properties - properties passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Set User Properties to keep behavior centralized and easier to reason about.
+ *
+ * @param properties - properties passed by the caller to control this behavior.
+ * @returns void
+ */
   setUserProperties(properties: Record<string, string | number | boolean>): void {
     // Store user properties for all future events
     if (this.isDev) {
@@ -228,12 +228,12 @@ private initializeProvider(): void {
     }
   }
 
-    /**
-   * Set Enabled so this code stays predictable and easier to maintain.
-   *
-   * @param enabled - enabled passed by the caller to control this behavior.
-   * @returnsVoid.
-   */
+ /**
+ * Set Enabled to keep behavior centralized and easier to reason about.
+ *
+ * @param enabled - enabled passed by the caller to control this behavior.
+ * @returns void
+ */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled;
     if (this.isDev) {

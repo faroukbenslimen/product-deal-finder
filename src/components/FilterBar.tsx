@@ -13,8 +13,8 @@ interface FilterBarProps {
 /**
  * Filter Bar.
  *
- * @param { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } - { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, }supplied by the caller.
- * @returnsVoid.
+ * @param { maxPrice, selectedStore, minRating, uniqueStores, detectedCurrency, onMaxPriceChange, onStoreChange, onMinRatingChange, } - Props supplied by the parent component.
+ * @returns void
  */
 export default function FilterBar({
   maxPrice,

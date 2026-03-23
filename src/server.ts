@@ -170,8 +170,8 @@ const modelResponseSchema = z.object({
 /**
  * Gets Client Ip.
  *
- * @param req - reqsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param req - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getClientIp(req: Request): string {
   const forwarded = req.headers['x-forwarded-for'];
@@ -184,7 +184,7 @@ function getClientIp(req: Request): string {
 /**
  * Checks whether Rate Limited.
  *
- * @param ip - ipsupplied by the caller.
+ * @param ip - Value supplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isRateLimited(ip: string): boolean {
@@ -206,8 +206,8 @@ function isRateLimited(ip: string): boolean {
 /**
  * Checks whether In Cooldown.
  *
- * @param ip - ipsupplied by the caller.
- * @param scope - scopesupplied by the caller.
+ * @param ip - Value supplied by the caller.
+ * @param scope - Value supplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: boolean; retryAfterMs: number } {
@@ -227,8 +227,8 @@ function isInCooldown(ip: string, scope: 'search' | 'identify'): { blocked: bool
 /**
  * Consume Daily Model Budget.
  *
- * @param units - unitssupplied by the caller.
- * @returnsVoid.
+ * @param units - Value supplied by the caller.
+ * @returns void
  */
 function consumeDailyModelBudget(units = 1): boolean {
   const currentDay = new Date().toISOString().slice(0, 10);
@@ -248,8 +248,8 @@ function consumeDailyModelBudget(units = 1): boolean {
 /**
  * Builds Repair Prompt.
  *
- * @param invalidText - invalidTextsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param invalidText - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function buildRepairPrompt(invalidText: string): string {
   return `You are a JSON repair assistant.
@@ -289,8 +289,8 @@ ${invalidText}`;
 /**
  * Extracts First Json Object.
  *
- * @param text - textsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param text - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function extractFirstJsonObject(text: string): string | null {
   const source = text.trim();
@@ -335,9 +335,9 @@ function extractFirstJsonObject(text: string): string | null {
 /**
  * To Safe String.
  *
- * @param value - valuesupplied by the caller.
- * @param fallback - fallbacksupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param fallback - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeString(value: unknown, fallback = ''): string {
   if (typeof value === 'string') return value;
@@ -348,9 +348,9 @@ function toSafeString(value: unknown, fallback = ''): string {
 /**
  * To Safe Number.
  *
- * @param value - valuesupplied by the caller.
- * @param fallback - fallbacksupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param fallback - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -364,9 +364,9 @@ function toSafeNumber(value: unknown, fallback = 0): number {
 /**
  * To Safe Currency.
  *
- * @param value - valuesupplied by the caller.
- * @param fallback - fallbacksupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @param fallback - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeCurrency(value: unknown, fallback = 'USD'): string {
   const raw = toSafeString(value, fallback).trim().toUpperCase();
@@ -379,8 +379,8 @@ function toSafeCurrency(value: unknown, fallback = 'USD'): string {
 /**
  * To Safe String Array.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -390,8 +390,8 @@ function toSafeStringArray(value: unknown): string[] {
 /**
  * To Safe Specifications.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function toSafeSpecifications(value: unknown): Array<{ feature: string; value: string }> {
   if (!Array.isArray(value)) return [];
@@ -411,8 +411,8 @@ function toSafeSpecifications(value: unknown): Array<{ feature: string; value: s
 /**
  * Coerce Model Payload.
  *
- * @param value - valuesupplied by the caller.
- * @returnsVoid.
+ * @param value - Value supplied by the caller.
+ * @returns void
  */
 function coerceModelPayload(value: unknown): unknown {
   const rootCandidate = value && typeof value === 'object' ? value as Record<string, unknown> : {};
@@ -455,8 +455,8 @@ function coerceModelPayload(value: unknown): unknown {
 /**
  * Parses And Validate Model Response.
  *
- * @param rawText - rawTextsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param rawText - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function parseAndValidateModelResponse(rawText: string) {
   const cleanText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -484,9 +484,9 @@ function parseAndValidateModelResponse(rawText: string) {
 /**
  * Builds Fallback Search Url.
  *
- * @param rec - recsupplied by the caller.
- * @param query - querysupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param rec - Value supplied by the caller.
+ * @param query - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
   const normalizedDomain = (rec.domain || '').trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -498,8 +498,8 @@ function buildFallbackSearchUrl(rec: Recommendation, query: string): string {
 /**
  * Tokenize.
  *
- * @param text - textsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param text - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function tokenize(text: string): string[] {
   return text
@@ -512,8 +512,8 @@ function tokenize(text: string): string[] {
 /**
  * Normalizes Host.
  *
- * @param value - valuesupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param value - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function normalizeHost(value: string): string {
   return value.toLowerCase().replace(/^www\./, '').trim();
@@ -522,9 +522,9 @@ function normalizeHost(value: string): string {
 /**
  * Host Matches Domain.
  *
- * @param host - hostsupplied by the caller.
- * @param domain - domainsupplied by the caller.
- * @returnsVoid.
+ * @param host - Value supplied by the caller.
+ * @param domain - Value supplied by the caller.
+ * @returns void
  */
 function hostMatchesDomain(host: string, domain: string): boolean {
   const safeHost = normalizeHost(host);
@@ -536,7 +536,7 @@ function hostMatchesDomain(host: string, domain: string): boolean {
 /**
  * Checks whether Likely Cdn Host.
  *
- * @param host - hostsupplied by the caller.
+ * @param host - Value supplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function isLikelyCdnHost(host: string): boolean {
@@ -552,9 +552,9 @@ function isLikelyCdnHost(host: string): boolean {
 /**
  * Evaluate Url Quality.
  *
- * @param rec - recsupplied by the caller.
- * @param query - querysupplied by the caller.
- * @returnsVoid.
+ * @param rec - Value supplied by the caller.
+ * @param query - Value supplied by the caller.
+ * @returns void
  */
 function evaluateUrlQuality(rec: Recommendation, query: string): { score: number; useDirect: boolean } {
   if (!rec.url) {
@@ -612,9 +612,9 @@ function evaluateUrlQuality(rec: Recommendation, query: string): { score: number
 /**
  * Sets Link Health.
  *
- * @param hostname - hostnamesupplied by the caller.
- * @param success - successsupplied by the caller.
- * @returnsVoid.
+ * @param hostname - Value supplied by the caller.
+ * @param success - Value supplied by the caller.
+ * @returns void
  */
 function setLinkHealth(hostname: string, success: boolean): void {
   if (!hostname) return;
@@ -627,8 +627,8 @@ function setLinkHealth(hostname: string, success: boolean): void {
 /**
  * Level From Score.
  *
- * @param score - scoresupplied by the caller.
- * @returnsVoid.
+ * @param score - Value supplied by the caller.
+ * @returns void
  */
 function levelFromScore(score: number): 'low' | 'medium' | 'high' {
   if (score >= 75) return 'high';
@@ -639,9 +639,9 @@ function levelFromScore(score: number): 'low' | 'medium' | 'high' {
 /**
  * Apply Link Fixes And Ranking.
  *
- * @param recs - recssupplied by the caller.
- * @param query - querysupplied by the caller.
- * @returnsVoid.
+ * @param recs - Value supplied by the caller.
+ * @param query - Value supplied by the caller.
+ * @returns void
  */
 function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recommendation[] {
   return recs.map((rec) => {
@@ -677,9 +677,9 @@ function applyLinkFixesAndRanking(recs: Recommendation[], query: string): Recomm
 /**
  * Fetches Model Content.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 async function fetchModelContent(query: string, region: string): Promise<string> {
   const response = await ai.models.generateContent({
@@ -700,7 +700,7 @@ async function fetchModelContent(query: string, region: string): Promise<string>
 /**
  * Should Try Fallback Provider.
  *
- * @param error - errorsupplied by the caller.
+ * @param error - Value supplied by the caller.
  * @returns True when the condition is met so callers can branch safely.
  */
 function shouldTryFallbackProvider(error: unknown): boolean {
@@ -722,8 +722,8 @@ function shouldTryFallbackProvider(error: unknown): boolean {
 /**
  * Fetches Model Content From Open Router.
  *
- * @param prompt - promptsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param prompt - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> {
   if (!openRouterApiKey) {
@@ -767,9 +767,9 @@ async function fetchModelContentFromOpenRouter(prompt: string): Promise<string> 
 /**
  * Fetches Model Content With Fallback.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 async function fetchModelContentWithFallback(query: string, region: string): Promise<{ text: string; provider: 'gemini' | 'openrouter' }> {
   try {
@@ -787,8 +787,8 @@ async function fetchModelContentWithFallback(query: string, region: string): Pro
 /**
  * Repair Model Content.
  *
- * @param invalidText - invalidTextsupplied by the caller.
- * @returnsVoid.
+ * @param invalidText - Value supplied by the caller.
+ * @returns void
  */
 async function repairModelContent(invalidText: string): Promise<string> {
   try {
@@ -813,9 +813,9 @@ async function repairModelContent(invalidText: string): Promise<string> {
 /**
  * Gets Cache Key.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getCacheKey(query: string, region: string): string {
   const normalizedQuery = query
@@ -835,9 +835,9 @@ function getCacheKey(query: string, region: string): string {
 /**
  * Gets Cached Result.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @returns The computed value this helper produces for downstream logic.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @returns Computed value used by downstream logic.
  */
 function getCachedResult(query: string, region: string): CacheEntry | null {
   const key = getCacheKey(query, region);
@@ -856,10 +856,10 @@ function getCachedResult(query: string, region: string): CacheEntry | null {
 /**
  * Sets Cached Result.
  *
- * @param query - querysupplied by the caller.
- * @param region - regionsupplied by the caller.
- * @param result - resultsupplied by the caller.
- * @returnsVoid.
+ * @param query - Value supplied by the caller.
+ * @param region - Value supplied by the caller.
+ * @param result - Value supplied by the caller.
+ * @returns void
  */
 function setCachedResult(query: string, region: string, result: CacheEntry['result']): void {
   const key = getCacheKey(query, region);

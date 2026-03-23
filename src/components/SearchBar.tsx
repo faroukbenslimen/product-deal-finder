@@ -16,8 +16,8 @@ interface SearchBarProps {
 /**
  * Search Bar.
  *
- * @param { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } - { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, }supplied by the caller.
- * @returnsVoid.
+ * @param { query, region, regions, isLoading, queryValidationError, onQueryChange, onRegionChange, onSubmit, } - Props supplied by the parent component.
+ * @returns void
  */
 export default function SearchBar({
   query,
