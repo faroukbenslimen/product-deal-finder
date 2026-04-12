@@ -8,6 +8,14 @@ describe('linkUtils', () => {
     expect(getDirectRecommendationHref({ url: 'https://store.com/item' })).toBe('https://store.com/item');
   });
 
+  it('strips tracking params from direct URL', () => {
+    const href = getDirectRecommendationHref({
+      url: 'https://store.com/product/abc?utm_source=test&gclid=123&sku=ABC-1',
+    });
+
+    expect(href).toBe('https://store.com/product/abc?sku=ABC-1');
+  });
+
   it('rejects invalid direct URL', () => {
     expect(getDirectRecommendationHref({ url: 'javascript:alert(1)' })).toBe('');
     expect(getDirectRecommendationHref({ url: 'not a url' })).toBe('');
@@ -17,6 +25,12 @@ describe('linkUtils', () => {
     expect(getDirectRecommendationHref({ url: 'https://d123abc.cloudfront.net/product-page' })).toBe('');
     expect(getDirectRecommendationHref({ url: 'https://assets.fastly.net/item/123' })).toBe('');
     expect(getDirectRecommendationHref({ url: 'https://images.akamaihd.net/catalog/sku-1' })).toBe('');
+  });
+
+  it('rejects search engine and listing URLs as direct links', () => {
+    expect(getDirectRecommendationHref({ url: 'https://www.google.com/search?q=headphones' })).toBe('');
+    expect(getDirectRecommendationHref({ url: 'https://shop.example.com/search?q=sony' })).toBe('');
+    expect(getDirectRecommendationHref({ url: 'https://store.example.com/category/headphones' })).toBe('');
   });
 
   it('builds reliable link from domain', () => {
@@ -31,10 +45,10 @@ describe('linkUtils', () => {
 
     expect(href).toContain('google.com/search?q=');
     expect(decodeURIComponent(href)).toContain('site:example.com');
-    expect(decodeURIComponent(href)).toContain('Sony WH-1000XM5 headphones');
+    expect(decodeURIComponent(href)).toContain('"Sony WH-1000XM5 headphones"');
   });
 
-  it('builds reliable link from direct URL hostname when domain missing', () => {
+  it('prefers direct recommendation URL when valid', () => {
     const href = getReliableRecommendationHref(
       {
         url: 'https://shop.domain.tld/item123',
@@ -44,6 +58,20 @@ describe('linkUtils', () => {
       'Meta Quest 3'
     );
 
+    expect(href).toBe('https://shop.domain.tld/item123');
+  });
+
+  it('uses fallback query when direct recommendation URL is weak', () => {
+    const href = getReliableRecommendationHref(
+      {
+        url: 'https://shop.domain.tld/search?q=meta+quest+3',
+        productName: 'Meta Quest 3',
+        storeName: 'Domain Shop',
+      },
+      'Meta Quest 3'
+    );
+
+    expect(href.startsWith('https://www.google.com/search?q=')).toBe(true);
     expect(decodeURIComponent(href)).toContain('site:shop.domain.tld');
   });
 

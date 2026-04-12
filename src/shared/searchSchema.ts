@@ -26,6 +26,7 @@ export interface Recommendation {
   linkSource?: 'direct' | 'fallback';
   linkQualityScore?: number;
   fallbackUrl?: string;
+  linkVerified?: boolean;
 }
 
 export interface SearchResult {

@@ -121,10 +121,18 @@ export default function ResultCard({
         </div>
 
         <div className="mb-3 flex items-center justify-between gap-2">
-          <span className={`inline-flex items-center px-2.5 py-1 text-[11px] border rounded-full font-semibold ${confidenceTone}`}>
-            <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-            {confidence}% confidence
-          </span>
+          <div className="flex items-center gap-2">
+            <span className={`inline-flex items-center px-2.5 py-1 text-[11px] border rounded-full font-semibold ${confidenceTone}`}>
+              <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+              {confidence}% confidence
+            </span>
+            {(rec.linkVerified || (rec.linkSource === 'direct' && (rec.linkQualityScore || 0) >= 75)) && (
+              <span className="inline-flex items-center px-2 py-0.5 text-[11px] border rounded-full font-semibold text-emerald-700 bg-emerald-50 border-emerald-100">
+                <ShieldCheck className="w-3.5 h-3.5 mr-1" />
+                Verified link
+              </span>
+            )}
+          </div>
           <span className="inline-flex items-center text-[11px] text-neutral-500 font-medium">
             <Clock3 className="w-3.5 h-3.5 mr-1" />
             updated now
