@@ -1,4 +1,4 @@
-﻿// File role: Top-level page composition for search, filters, and result presentation.
+// File role: Top-level page composition for search, filters, and result presentation.
 import { type DragEvent as ReactDragEvent, useEffect, useState } from 'react';
 import { ShoppingBag, Star, AlertCircle, Filter, Camera, Heart, TrendingUp, ShieldCheck } from 'lucide-react';
 // Keep motion/react: this screen relies on coordinated enter/exit transitions and staggered card animations.
@@ -16,7 +16,7 @@ import ComparisonTable from './components/ComparisonTable';
 import RecommendationModal from './components/RecommendationModal';
 import { useProductSearch } from './hooks/useProductSearch';
 
-const PLACEHOLDER_IMAGE = 'https://placehold.co/640x420/e5e7eb/6b7280?text=No+Image';
+const PLACEHOLDER_IMAGE = '/product_placeholder.png';
 
 /**
  * Gets Recommendation Key.

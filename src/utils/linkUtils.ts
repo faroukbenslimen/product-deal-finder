@@ -1,4 +1,4 @@
-﻿// File role: URL normalization and safe link generation for recommendation actions.
+// File role: URL normalization and safe link generation for recommendation actions.
 export interface LinkInput {
   url?: string;
   domain?: string;
@@ -194,12 +194,18 @@ export function getReliableRecommendationHref(input: LinkInput, query: string): 
 
   const productTerm = (input.productName || query || '').trim();
   const storeTerm = (input.storeName || '').trim();
+
+  // Region-aware fallback for local stores (e.g. Tunisia)
+  const isTunisia = (input.fallbackUrl?.includes('Tunisie') || query.toLowerCase().includes('tunisie'));
+  const regionTag = isTunisia ? 'Tunisie prix' : 'buy';
+
   const searchQuery = [
     safeDomain ? `site:${safeDomain}` : '',
-    productTerm ? `"${productTerm}"` : '',
-    storeTerm ? `"${storeTerm}"` : '',
-    'buy',
+    productTerm,
+    storeTerm,
+    regionTag,
   ].filter(Boolean).join(' ') || query;
+
   return `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
 }
 

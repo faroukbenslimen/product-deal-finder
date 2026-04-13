@@ -1,4 +1,4 @@
-﻿// File role: Runtime-safe normalization and typing for AI search responses.
+// File role: Runtime-safe normalization and typing for AI search responses.
 export interface Specification {
   feature: string;
   value: string;
@@ -225,6 +225,10 @@ function normalizeRecommendation(value: unknown): Recommendation {
     specifications: normalizeSpecifications(rec.specifications),
     confidenceScore,
     confidenceLevel,
+    linkSource: toSafeString(rec.linkSource) as any,
+    linkQualityScore: toSafeNumber(rec.linkQualityScore),
+    linkVerified: Boolean(rec.linkVerified),
+    fallbackUrl: toSafeString(rec.fallbackUrl),
   };
 }
 

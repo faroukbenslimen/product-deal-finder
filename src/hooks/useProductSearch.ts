@@ -1,4 +1,4 @@
-﻿// File role: Centralized search state and async workflow orchestration hook.
+// File role: Centralized search state and async workflow orchestration hook.
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { analytics } from '../analytics';
 import { normalizeSearchResult, type SearchResult } from '../shared/searchSchema';
@@ -137,12 +137,6 @@ export function useProductSearch() {
         body: JSON.stringify({ query: queryToSearch, region: regionToSearch }),
         signal: controller.signal,
       });
-
-      if (response.status === 429) {
-        const tooManyError = new Error('Too many searches. Please wait a moment and try again.') as Error & { status?: number };
-        tooManyError.status = 429;
-        throw tooManyError;
-      }
 
       const contentType = response.headers.get('content-type') || '';
       let payload: unknown = null;

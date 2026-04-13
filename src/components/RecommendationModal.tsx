@@ -1,4 +1,4 @@
-﻿// File role: Expanded recommendation detail modal with links and specifications.
+// File role: Expanded recommendation detail modal with links and specifications.
 import { CheckCircle2, ExternalLink, XCircle } from 'lucide-react';
 // Keep motion/react here for modal mount/unmount choreography and backdrop/content synchronization.
 import { motion, AnimatePresence } from 'motion/react';
@@ -65,8 +65,11 @@ export default function RecommendationModal({
                   referrerPolicy="no-referrer"
                   onError={(event) => {
                     const target = event.currentTarget;
-                    target.onerror = null;
-                    target.src = placeholderImage;
+                    if (target.src.endsWith(placeholderImage)) {
+                      target.style.display = 'none';
+                    } else {
+                      target.src = placeholderImage;
+                    }
                   }}
                 />
               </div>

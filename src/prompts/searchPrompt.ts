@@ -1,18 +1,29 @@
-﻿// File role: Prompt builder that defines the structured AI search output contract.
+// File role: Prompt builder that defines the structured AI search output contract.
 /**
  * Builds Search Prompt.
  *
  * @param query - Value supplied by the caller.
  * @param region - Value supplied by the caller.
+ * @param storePatterns - Dictionary of known store URL structures for discovery.
  * @returns Computed value used by downstream logic.
  */
-export function buildSearchPrompt(query: string, region: string): string {
+export function buildSearchPrompt(query: string, region: string, storePatterns: Record<string, string[]> = {}): string {
   const regionContext =
     region !== 'Global'
-      ? `\nCRITICAL REGION CONSTRAINT: You MUST ONLY return stores that are physically located in ${region} OR explicitly state they ship to ${region}. If the product is completely unavailable for purchase or shipping in ${region}, you MUST return an empty "recommendations" array [] and explain the unavailability in the "summary". Do NOT fallback to US/Global stores if they do not ship to ${region}. Prices MUST be converted to the local currency of ${region} if possible. If you are unsure if a store ships to ${region}, DO NOT include it.`
+      ? `\nCRITICAL REGION CONSTRAINT: You MUST find the best deals for buyers in ${region}.
+- **Prioritize Local**: First, search for stores physically located in ${region} or on .${region.toLowerCase().slice(0, 2)} domains (e.g., .tn for Tunisia, .fr for France, .uk for UK).
+- **International Fallback**: If local stores are unavailable or overpriced, you may include reputable international stores (like Amazon, AliExpress, eBay, B&H) that are well-known for shipping to ${region}.
+- **Accuracy**: Always prioritize the specific regional site (e.g., Amazon.fr for France) when it exists.
+- **Empty Results**: Only return an empty "recommendations" array [] if the product is genuinely illegal or impossible to ship to ${region}.`
       : ' globally';
 
-  return `Find the best places to buy "${query}"${region !== 'Global' ? '' : ' globally'}. ${regionContext}
+  const patternHint = Object.entries(storePatterns).length > 0 
+    ? `\n\nKNOWN STORE PATTERNS (for Direct URL Discovery):
+      Use these as a guide for what a REAL product page URL looks like:
+      ${Object.entries(storePatterns).map(([name, patterns]) => `- ${name}: ${patterns.join(', ')}`).join('\n      ')}`
+    : '';
+
+  return `Find the best places to buy "${query}"${region !== 'Global' ? '' : ' globally'}. ${regionContext} ${patternHint}
 
 CRITICAL: You MUST return ONLY a valid JSON object. Do NOT wrap it in \`\`\`json markdown. Just return the raw JSON starting with { and ending with }.
 
@@ -42,18 +53,18 @@ The JSON must have this exact structure:
   "detectedCurrency": "USD"
 }
 
-CRITICAL RELEVANCE INSTRUCTION: You MUST return ONLY products that clearly match the user's search query ("${query}"). Do NOT include unrelated products.
+CRITICAL DIRECT-FIRST MANDATE: Your ABSOLUTE PRIORITY is to find the DIRECT product landing page. 
+- A search result or category page is a FAILURE.
+- If your first search only returns aggregator/search links, YOU MUST perform a second search using specific operators like 'site:[domain] "${query}"' to isolate the actual product page.
+- Do NOT settle for "google.com/search..." or "store.com/search?q=..." links.
+- Use your tools to verify you are on a page that actually allows a user to "Add to Cart" or "Buy Now".
 
-CRITICAL RESULT COUNT INSTRUCTION: Return 5-8 recommendations whenever possible, with at least 3 recommendations unless the product is truly unavailable in the selected region.
+CRITICAL RELEVANCE INSTRUCTION: You MUST return ONLY products that clearly match the user's search query ("${query}"). Do NOT include unrelated products.
 
 CRITICAL DIVERSITY INSTRUCTION: Prefer diverse sources (official store + marketplaces + specialist retailers + price comparison/listing sites where buyers can reach a real offer).
 
 CRITICAL CURRENCY INSTRUCTION: Set detectedCurrency to the ISO 4217 currency code most appropriate for the selected region.
 
-CRITICAL BEST REASON INSTRUCTION: For the store marked isBest: true, provide a bestReason string of one sentence explaining why it is the best pick (e.g., "Lowest price with fast local shipping and strong reviews").
-
-If fewer than 3 trustworthy stores are actually available for ${region}, you may return fewer, but explain why in summary.
-
-CRITICAL URL INSTRUCTION: DO NOT GUESS OR CONSTRUCT URLs. If you do not have the EXACT, VERIFIED url directly from your search results, you MUST leave the 'url' field EMPTY ("").`;
+CRITICAL BEST REASON INSTRUCTION: For the store marked isBest: true, provide a bestReason string of one sentence explaining why it is the best pick (e.g., "Lowest price with fast local shipping and strong reviews").`;
 }
 

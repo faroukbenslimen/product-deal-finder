@@ -1,4 +1,4 @@
-﻿// File role: Individual recommendation card with pricing, trust, and CTA actions.
+// File role: Individual recommendation card with pricing, trust, and CTA actions.
 import { CheckCircle2, Clock3, ExternalLink, Heart, Package, ShieldCheck, Star, Truck, XCircle } from 'lucide-react';
 import { type Recommendation } from '../shared/searchSchema';
 
@@ -61,7 +61,7 @@ export default function ResultCard({
     >
       {rec.isBest && (
         <div className="absolute top-3 right-3 z-10 bg-indigo-100 text-indigo-700 text-xs font-semibold px-2 py-1 rounded-full">
-          â­ Best Pick
+          ⭐ Best Pick
         </div>
       )}
 
@@ -70,16 +70,20 @@ export default function ResultCard({
       >
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.75),rgba(248,250,252,0.15)_45%,rgba(226,232,240,0.35))]" />
         <div className="absolute left-1/2 bottom-3 h-5 w-2/3 -translate-x-1/2 rounded-full bg-slate-900/12 blur-md" />
-        <div className="relative z-[1] m-3 h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] rounded-xl border border-white/80 bg-white/70 shadow-[0_14px_32px_-20px_rgba(15,23,42,0.85)] backdrop-blur-[1px] flex items-center justify-center overflow-hidden">
+        <div className="relative z-[1] m-3 h-[calc(100%-1.5rem)] w-[calc(100%-1.5rem)] rounded-xl border border-white/80 bg-white/90 shadow-[0_10px_25px_-15px_rgba(15,23,42,0.6)] flex items-center justify-center overflow-hidden">
           <img
             src={rec.imageUrl || placeholderImage}
             alt={rec.productName || rec.storeName}
-            className="w-full h-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-[1.02]"
+            className="w-full h-full object-contain p-2.5 transition-transform duration-300 group-hover:scale-[1.02] will-change-transform"
             referrerPolicy="no-referrer"
             onError={(event) => {
               const target = event.currentTarget;
-              target.onerror = null;
-              target.src = placeholderImage;
+              if (target.src.endsWith(placeholderImage)) {
+                // If even the placeholder fails, hide the image to prevent loops
+                target.style.display = 'none';
+              } else {
+                target.src = placeholderImage;
+              }
             }}
           />
         </div>
@@ -207,7 +211,7 @@ export default function ResultCard({
               : 'bg-indigo-600 text-white hover:bg-indigo-700'
           }`}
         >
-          {isFallbackLink ? 'ðŸ” Search on Google' : 'View Deal'}
+          {isFallbackLink ? '🔍 Search on Google' : 'View Deal'}
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
@@ -224,9 +228,7 @@ export default function ResultCard({
           </a>
         </div>
       )}
-      {!rec.url?.trim() && (
-        <div className="px-5 pb-4 text-xs text-neutral-500">Fallback link generated from store domain.</div>
-      )}
+
     </div>
   );
 }
